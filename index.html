@@ -5,134 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GimlaTech Helper</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f1f5f9; --dark: #1e293b; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: #cbd5e1; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        :root { --main: #2563eb; --dark: #1e293b; --bg: #f8fafc; }
+        body { font-family: system-ui, sans-serif; background: #e2e8f0; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        /* מסגרת האפליקציה - "המכשיר" */
-        .phone-wrapper { 
-            width: 375px; height: 750px; background: white; 
-            border: 12px solid var(--dark); border-radius: 45px; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4); 
-            display: flex; flex-direction: column; overflow: hidden; position: relative;
+        /* מסגרת האפליקציה */
+        .app-shell { 
+            width: 360px; height: 700px; background: white; 
+            border: 10px solid var(--dark); border-radius: 40px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); 
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
-        .app-header { background: var(--dark); color: white; padding: 25px 20px 15px; text-align: center; font-weight: bold; font-size: 20px; border-bottom: 2px solid #334155; }
-        .content { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; }
+        .header { background: var(--dark); color: white; padding: 20px; text-align: center; font-weight: bold; }
+        .container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
         
-        .step-title { font-size: 22px; font-weight: bold; color: var(--dark); margin-bottom: 10px; text-align: center; }
-        .step-desc { font-size: 15px; color: #64748b; text-align: center; margin-bottom: 25px; }
-
-        .btn-option { 
-            width: 100%; padding: 20px; margin-bottom: 15px; 
-            background: white; border: 2px solid #e2e8f0; border-radius: 18px; 
-            display: flex; align-items: center; cursor: pointer; transition: 0.2s; 
-            font-size: 18px; font-weight: bold; color: var(--dark); text-align: right;
+        .btn { 
+            width: 100%; padding: 18px; margin-bottom: 12px; 
+            background: white; border: 2px solid #cbd5e1; border-radius: 15px; 
+            cursor: pointer; font-size: 17px; font-weight: bold; text-align: right;
+            display: flex; align-items: center;
         }
-        .btn-option:active { transform: scale(0.97); border-color: var(--primary); background: #eff6ff; }
-        .icon-circle { width: 45px; height: 45px; border-radius: 12px; margin-left: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .btn:active { background: #f1f5f9; border-color: var(--main); }
+        .icon { font-size: 24px; margin-left: 15px; }
 
-        .back-link { color: var(--primary); font-weight: bold; cursor: pointer; display: block; margin-bottom: 15px; font-size: 14px; }
         .hidden { display: none; }
-
-        /* אזור AI */
-        .ai-box { background: #f0f7ff; border: 1px solid #c3dafe; padding: 15px; border-radius: 20px; margin-top: 20px; }
-        textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px; margin: 10px 0; font-family: inherit; box-sizing: border-box; }
-        .btn-send { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
-
-        .share-bar { padding: 15px; border-top: 1px solid #e2e8f0; text-align: center; }
-        .btn-share { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #475569; }
+        .back-btn { color: var(--main); cursor: pointer; font-weight: bold; margin-bottom: 15px; border: none; background: none; font-size: 14px; }
+        
+        textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px; margin: 10px 0; font-family: inherit; resize: none; box-sizing: border-box; }
+        .send-btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; }
+        
+        .footer { padding: 10px; text-align: center; border-top: 1px solid #f1f5f9; }
+        .share { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 15px; border-radius: 20px; font-size: 12px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="phone-wrapper">
-    <div class="app-header">GimlaTech Helper</div>
+<div class="app-shell">
+    <div class="header">GimlaTech Helper</div>
 
-    <div class="content">
-        <div id="screen1">
-            <div class="step-title">שלום! במה נטפל?</div>
-            <div class="step-desc">בחרו את סוג המכשיר הבעייתי:</div>
+    <div class="container">
+        <div id="s1">
+            <h2 style="font-size: 20px; text-align: center;">במה אפשר לעזור?</h2>
+            <button class="btn" onclick="go2('pc')"><span class="icon">💻</span>מחשב</button>
+            <button class="btn" onclick="go2('phone')"><span class="icon">📱</span>טלפון</button>
+            <button class="btn" onclick="go2('extra')"><span class="icon">🖨️</span>ציוד היקפי</button>
             
-            <div class="btn-option" onclick="showOS('pc')">
-                <div class="icon-circle" style="background: #dbeafe;">💻</div>
-                <span>מחשב</span>
-            </div>
-            <div class="btn-option" onclick="showOS('phone')">
-                <div class="icon-circle" style="background: #dcfce7;">📱</div>
-                <span>טלפון</span>
-            </div>
-            <div class="btn-option" onclick="showOS('extra')">
-                <div class="icon-circle" style="background: #f3e8ff;">🖨️</div>
-                <span>ציוד היקפי</span>
-            </div>
-            
-            <div style="text-align:center; margin-top: 20px; color: #94a3b8; font-weight: bold; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 15px;">
+            <div style="border: 2px dashed #cbd5e1; padding: 15px; border-radius: 15px; text-align: center; margin-top: 20px; color: #64748b;">
                 📸 העלאת צילום מסך
             </div>
         </div>
 
-        <div id="screen2" class="hidden">
-            <div class="back-link" onclick="showScreen(1)">← חזרה למסך הראשי</div>
-            <div class="step-title" id="os-title">איזו מערכת?</div>
-            <div id="os-container"></div>
+        <div id="s2" class="hidden">
+            <button class="back-btn" onclick="go1()">← חזרה</button>
+            <h2 id="os-title" style="font-size: 18px;">איזו מערכת?</h2>
+            <div id="os-list"></div>
         </div>
 
-        <div id="screen3" class="hidden">
-            <div class="back-link" onclick="showScreen(2)">← חזרה</div>
-            <div class="step-title">מה הבעיה?</div>
+        <div id="s3" class="hidden">
+            <button class="back-btn" onclick="goBackTo2()">← חזרה</button>
+            <h2 style="font-size: 18px;">מה הבעיה?</h2>
+            <button class="btn" onclick="done()">🌐 האינטרנט לא עובד</button>
+            <button class="btn" onclick="done()">🔌 המכשיר לא נדלק</button>
+            <button class="btn" onclick="done()">❄️ הכל קפוא</button>
             
-            <div id="issues-container">
-                <div class="btn-option" onclick="handleFinish()">🌐 האינטרנט לא עובד</div>
-                <div class="btn-option" onclick="handleFinish()">🔌 לא נדלק / לא מגיב</div>
-                <div class="btn-option" onclick="handleFinish()">❄️ המכשיר קפוא</div>
-            </div>
-
-            <div class="ai-box">
-                <div style="font-weight: bold; color: #1e40af;">תיאור חופשי (AI):</div>
-                <textarea id="ai-text" placeholder="למשל: המדפסת מוציאה דפים ריקים..."></textarea>
-                <button class="btn-send" onclick="handleFinish()">בקש עזרה מה-AI</button>
+            <div style="margin-top: 20px; padding: 15px; background: #eff6ff; border-radius: 15px;">
+                <label style="font-weight: bold; font-size: 14px;">תיאור חופשי לעזרה מה-AI:</label>
+                <textarea id="ai-input" placeholder="כתבו כאן מה קרה..."></textarea>
+                <button class="send-btn" onclick="done()">שלח לבדיקת AI</button>
             </div>
         </div>
     </div>
 
-    <div class="share-bar">
-        <button class="btn-share" onclick="alert('הקישור הועתק!')">🔗 שיתוף אפליקציה</button>
+    <div class="footer">
+        <button class="share" onclick="alert('הקישור הועתק!')">🔗 שיתוף אפליקציה</button>
     </div>
 </div>
 
 <script>
-    const osData = {
-        pc: { title: 'איזה מחשב זה?', options: ['Windows (ווינדוס)', 'Mac (אפל)'] },
-        phone: { title: 'איזה טלפון זה?', options: ['Android (סמסונג/אחר)', 'iPhone (אפל)'] },
-        extra: { title: 'איזה ציוד זה?', options: ['מדפסת', 'רמקולים', 'מקלדת/עכבר'] }
+    // הגדרות נתונים
+    const data = {
+        pc: { t: 'איזה מחשב?', list: ['Windows (ווינדוס)', 'Mac (אפל)'] },
+        phone: { t: 'איזה טלפון?', list: ['Android (סמסונג/אחר)', 'iPhone (אפל)'] },
+        extra: { t: 'איזה ציוד?', list: ['מדפסת', 'רמקולים', 'עכבר/מקלדת'] }
     };
 
-    function showScreen(num) {
-        document.getElementById('screen1').classList.add('hidden');
-        document.getElementById('screen2').classList.add('hidden');
-        document.getElementById('screen3').classList.add('hidden');
-        document.getElementById('screen' + num).classList.remove('hidden');
+    let selectedDevice = '';
+
+    // פונקציות ניווט פשוטות (ללא ספריות חיצוניות)
+    function go1() {
+        document.getElementById('s2').className = 'hidden';
+        document.getElementById('s1').className = '';
     }
 
-    function showOS(device) {
-        const container = document.getElementById('os-container');
-        document.getElementById('os-title').innerText = osData[device].title;
-        container.innerHTML = '';
+    function go2(device) {
+        selectedDevice = device;
+        document.getElementById('s1').className = 'hidden';
+        document.getElementById('s2').className = '';
         
-        osData[device].options.forEach(os => {
-            const btn = document.createElement('div');
-            btn.className = 'btn-option';
-            btn.innerHTML = `<span>${os}</span>`;
-            btn.onclick = () => showScreen(3);
-            container.appendChild(btn);
+        document.getElementById('os-title').innerText = data[device].t;
+        const listDiv = document.getElementById('os-list');
+        listDiv.innerHTML = '';
+        
+        data[device].list.forEach(item => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = item;
+            b.onclick = go3;
+            listDiv.appendChild(b);
         });
-        showScreen(2);
     }
 
-    function handleFinish() {
-        const text = document.getElementById('ai-text').value;
-        alert("הבקשה התקבלה בהצלחה!\nאנחנו מנתחים את התקלה ומחזירים תשובה...");
-        location.reload();
+    function go3() {
+        document.getElementById('s2').className = 'hidden';
+        document.getElementById('s3').className = '';
+    }
+
+    function goBackTo2() {
+        document.getElementById('s3').className = 'hidden';
+        document.getElementById('s2').className = '';
+    }
+
+    function done() {
+        alert("הבקשה התקבלה! \nאנחנו מנתחים את התקלה עבורכם.");
+        // במקום לרענן (שיכול לגרום לבעיות בסביבות מסוימות), פשוט נחזור להתחלה
+        document.getElementById('ai-input').value = '';
+        go1();
+        document.getElementById('s3').className = 'hidden';
     }
 </script>
 
