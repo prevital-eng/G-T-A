@@ -5,190 +5,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GimlaTech Helper</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --bg: #f1f5f9;
-            --text: #1e293b;
-        }
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        /* מסגרת האפליקציה */
-        .app-frame {
-            width: 100%;
-            max-width: 380px;
-            height: 90vh;
-            background: white;
-            border: 10px solid #1e293b;
-            border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-        .header {
-            background: #1e293b;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .card {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .card:active { transform: scale(0.98); border-color: var(--primary); }
-        .card-icon { font-size: 24px; background: #eff6ff; padding: 10px; border-radius: 12px; }
-        .card-title { font-size: 18px; font-weight: bold; color: var(--text); }
+        :root { --primary: #2563eb; --bg: #f1f5f9; --dark: #1e293b; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #cbd5e1; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        .btn-back { color: var(--primary); background: none; border: none; font-weight: bold; cursor: pointer; padding: 0; text-align: right; margin-bottom: 10px; }
-        
-        .footer { padding: 15px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
-        
-        .hidden { display: none; }
-        
-        h2 { margin: 0 0 5px 0; color: var(--text); }
-        p { margin: 0 0 20px 0; color: #64748b; font-size: 14px; }
+        /* מסגרת האפליקציה - "המכשיר" */
+        .phone-wrapper { 
+            width: 375px; height: 750px; background: white; 
+            border: 12px solid var(--dark); border-radius: 45px; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4); 
+            display: flex; flex-direction: column; overflow: hidden; position: relative;
+        }
 
-        /* כפתור העלאת תמונה */
-        .upload-zone {
-            border: 2px dashed #cbd5e1;
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            color: #64748b;
-            font-weight: bold;
-            margin-bottom: 10px;
+        .app-header { background: var(--dark); color: white; padding: 25px 20px 15px; text-align: center; font-weight: bold; font-size: 20px; border-bottom: 2px solid #334155; }
+        .content { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; }
+        
+        .step-title { font-size: 22px; font-weight: bold; color: var(--dark); margin-bottom: 10px; text-align: center; }
+        .step-desc { font-size: 15px; color: #64748b; text-align: center; margin-bottom: 25px; }
+
+        .btn-option { 
+            width: 100%; padding: 20px; margin-bottom: 15px; 
+            background: white; border: 2px solid #e2e8f0; border-radius: 18px; 
+            display: flex; align-items: center; cursor: pointer; transition: 0.2s; 
+            font-size: 18px; font-weight: bold; color: var(--dark); text-align: right;
         }
+        .btn-option:active { transform: scale(0.97); border-color: var(--primary); background: #eff6ff; }
+        .icon-circle { width: 45px; height: 45px; border-radius: 12px; margin-left: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+
+        .back-link { color: var(--primary); font-weight: bold; cursor: pointer; display: block; margin-bottom: 15px; font-size: 14px; }
+        .hidden { display: none; }
+
+        /* אזור AI */
+        .ai-box { background: #f0f7ff; border: 1px solid #c3dafe; padding: 15px; border-radius: 20px; margin-top: 20px; }
+        textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px; margin: 10px 0; font-family: inherit; box-sizing: border-box; }
+        .btn-send { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
+
+        .share-bar { padding: 15px; border-top: 1px solid #e2e8f0; text-align: center; }
+        .btn-share { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #475569; }
     </style>
 </head>
 <body>
 
-<div class="app-frame">
-    <div class="header">
-        <span>GimlaTech Helper</span>
-        <button onclick="location.reload()" style="background:none; border:none; color:white; cursor:pointer;">🏠</button>
-    </div>
+<div class="phone-wrapper">
+    <div class="app-header">GimlaTech Helper</div>
 
-    <div class="content" id="app-content">
-        <div id="step-1">
-            <div class="upload-zone">📸 העלאת צילום מסך</div>
-            <h2>במה אפשר לעזור?</h2>
-            <p>בחרו את סוג המכשיר שבו יש תקלה:</p>
+    <div class="content">
+        <div id="screen1">
+            <div class="step-title">שלום! במה נטפל?</div>
+            <div class="step-desc">בחרו את סוג המכשיר הבעייתי:</div>
             
-            <div class="card" onclick="goToStep2('pc')">
-                <span class="card-icon">💻</span>
-                <span class="card-title">מחשב</span>
+            <div class="btn-option" onclick="showOS('pc')">
+                <div class="icon-circle" style="background: #dbeafe;">💻</div>
+                <span>מחשב</span>
             </div>
-            <div class="card" onclick="goToStep2('phone')">
-                <span class="card-icon">📱</span>
-                <span class="card-title">טלפון</span>
+            <div class="btn-option" onclick="showOS('phone')">
+                <div class="icon-circle" style="background: #dcfce7;">📱</div>
+                <span>טלפון</span>
             </div>
-            <div class="card" onclick="goToStep2('extra')">
-                <span class="card-icon">🖨️</span>
-                <span class="card-title">ציוד היקפי</span>
+            <div class="btn-option" onclick="showOS('extra')">
+                <div class="icon-circle" style="background: #f3e8ff;">🖨️</div>
+                <span>ציוד היקפי</span>
+            </div>
+            
+            <div style="text-align:center; margin-top: 20px; color: #94a3b8; font-weight: bold; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 15px;">
+                📸 העלאת צילום מסך
             </div>
         </div>
 
-        <div id="step-2" class="hidden">
-            <button class="btn-back" onclick="goToStep1()">← חזרה</button>
-            <h2 id="os-title">איזו מערכת?</h2>
-            <div id="os-options"></div>
+        <div id="screen2" class="hidden">
+            <div class="back-link" onclick="showScreen(1)">← חזרה למסך הראשי</div>
+            <div class="step-title" id="os-title">איזו מערכת?</div>
+            <div id="os-container"></div>
         </div>
 
-        <div id="step-3" class="hidden">
-            <button class="btn-back" onclick="goBackToStep2()">← חזרה</button>
-            <h2>מה הבעיה?</h2>
-            <div id="issue-options">
-                <div class="card" onclick="finish()">🌐 האינטרנט לא עובד</div>
-                <div class="card" onclick="finish()">🔌 המכשיר לא נדלק</div>
-                <div class="card" onclick="finish()">❄️ המסך קפוא</div>
-                <div class="card" onclick="finish()">⚠️ הודעת שגיאה</div>
+        <div id="screen3" class="hidden">
+            <div class="back-link" onclick="showScreen(2)">← חזרה</div>
+            <div class="step-title">מה הבעיה?</div>
+            
+            <div id="issues-container">
+                <div class="btn-option" onclick="handleFinish()">🌐 האינטרנט לא עובד</div>
+                <div class="btn-option" onclick="handleFinish()">🔌 לא נדלק / לא מגיב</div>
+                <div class="btn-option" onclick="handleFinish()">❄️ המכשיר קפוא</div>
             </div>
-            <div style="margin-top: 20px;">
-                <label style="font-size: 13px; font-weight: bold;">או תארו במילים שלכם:</label>
-                <textarea style="width:100%; border:1px solid #ddd; border-radius:10px; margin-top:5px; padding:10px;" rows="3"></textarea>
-                <button onclick="finish()" style="width:100%; background:#2563eb; color:white; border:none; padding:12px; border-radius:10px; font-weight:bold; margin-top:10px;">בקש פתרון מה-AI</button>
+
+            <div class="ai-box">
+                <div style="font-weight: bold; color: #1e40af;">תיאור חופשי (AI):</div>
+                <textarea id="ai-text" placeholder="למשל: המדפסת מוציאה דפים ריקים..."></textarea>
+                <button class="btn-send" onclick="handleFinish()">בקש עזרה מה-AI</button>
             </div>
         </div>
     </div>
 
-    <div class="footer">
-        © 2026 GimlaTech Helper
+    <div class="share-bar">
+        <button class="btn-share" onclick="alert('הקישור הועתק!')">🔗 שיתוף אפליקציה</button>
     </div>
 </div>
 
 <script>
-    let currentDevice = '';
-
-    const config = {
-        pc: { label: 'מחשב', os: ['Windows (ווינדוס)', 'Mac (אפל)'] },
-        phone: { label: 'טלפון', os: ['Android (אנדרואיד)', 'iPhone (אייפון)'] },
-        extra: { label: 'ציוד היקפי', os: ['מדפסת', 'רמקולים', 'מקלדת/עכבר'] }
+    const osData = {
+        pc: { title: 'איזה מחשב זה?', options: ['Windows (ווינדוס)', 'Mac (אפל)'] },
+        phone: { title: 'איזה טלפון זה?', options: ['Android (סמסונג/אחר)', 'iPhone (אפל)'] },
+        extra: { title: 'איזה ציוד זה?', options: ['מדפסת', 'רמקולים', 'מקלדת/עכבר'] }
     };
 
-    function goToStep2(device) {
-        currentDevice = device;
-        document.getElementById('step-1').classList.add('hidden');
-        document.getElementById('step-2').classList.remove('hidden');
+    function showScreen(num) {
+        document.getElementById('screen1').classList.add('hidden');
+        document.getElementById('screen2').classList.add('hidden');
+        document.getElementById('screen3').classList.add('hidden');
+        document.getElementById('screen' + num).classList.remove('hidden');
+    }
+
+    function showOS(device) {
+        const container = document.getElementById('os-container');
+        document.getElementById('os-title').innerText = osData[device].title;
+        container.innerHTML = '';
         
-        const osTitle = document.getElementById('os-title');
-        osTitle.innerText = `איזה ${config[device].label} יש לך?`;
-        
-        const osOptions = document.getElementById('os-options');
-        osOptions.innerHTML = '';
-        config[device].os.forEach(os => {
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.innerHTML = `<span class="card-title">${os}</span>`;
-            div.onclick = () => goToStep3();
-            osOptions.appendChild(div);
+        osData[device].options.forEach(os => {
+            const btn = document.createElement('div');
+            btn.className = 'btn-option';
+            btn.innerHTML = `<span>${os}</span>`;
+            btn.onclick = () => showScreen(3);
+            container.appendChild(btn);
         });
+        showScreen(2);
     }
 
-    function goToStep1() {
-        document.getElementById('step-2').classList.add('hidden');
-        document.getElementById('step-1').classList.remove('hidden');
-    }
-
-    function goToStep3() {
-        document.getElementById('step-2').classList.add('hidden');
-        document.getElementById('step-3').classList.remove('hidden');
-    }
-
-    function goBackToStep2() {
-        document.getElementById('step-3').classList.add('hidden');
-        document.getElementById('step-2').classList.remove('hidden');
-    }
-
-    function finish() {
-        alert("הבקשה התקבלה! סורק פתרונות...");
+    function handleFinish() {
+        const text = document.getElementById('ai-text').value;
+        alert("הבקשה התקבלה בהצלחה!\nאנחנו מנתחים את התקלה ומחזירים תשובה...");
         location.reload();
     }
 </script>
