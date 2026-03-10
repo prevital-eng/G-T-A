@@ -6,240 +6,84 @@
     <title>GimlaTech Helper</title>
     <style>
         :root { --main: #2563eb; --dark: #1e293b; }
-        * { box-sizing: border-box; }
-        body { font-family: system-ui, sans-serif; background: #e2e8f0; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-
-        .app-shell {
-            width: 360px; min-height: 700px; background: white;
-            border: 10px solid var(--dark); border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column; overflow: hidden;
-        }
-
-        .header { background: var(--dark); color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 18px; }
-        .container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
-
-        .btn {
-            width: 100%; padding: 16px 15px; margin-bottom: 10px;
-            background: white; border: 2px solid #cbd5e1; border-radius: 15px;
-            cursor: pointer; font-size: 16px; font-weight: bold; text-align: right;
-            display: flex; align-items: center; transition: all 0.15s;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, sans-serif; background: #f1f5f9; }
+        .app-shell { width: 100%; max-width: 500px; min-height: 100vh; margin: 0 auto; background: white; display: flex; flex-direction: column; }
+        .header { background: var(--dark); color: white; padding: 18px 20px; text-align: center; font-weight: bold; font-size: 18px; }
+        .header small { font-size: 12px; opacity: 0.7; display: block; margin-top: 2px; }
+        .container { flex: 1; padding: 18px; }
+        .btn { width: 100%; padding: 14px 15px; margin-bottom: 9px; background: white; border: 2px solid #cbd5e1; border-radius: 14px; cursor: pointer; font-size: 15px; font-weight: bold; text-align: right; display: flex; align-items: center; gap: 10px; transition: all 0.15s; color: #1e293b; }
         .btn:hover { background: #f1f5f9; border-color: var(--main); }
-
-        .hidden { display: none !important; }
-        .back-btn { color: var(--main); cursor: pointer; font-weight: bold; margin-bottom: 15px; border: none; background: none; font-size: 14px; padding: 0; }
-
-        .tag { background: #dbeafe; color: #1e40af; font-size: 12px; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
-
-        .free-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 15px; padding: 15px; margin-top: 10px; }
-        .free-box label { font-weight: bold; font-size: 14px; color: #475569; display: block; margin-bottom: 8px; }
-        .free-box input { width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 15px; }
-        .free-box input:focus { outline: none; border-color: var(--main); }
-
-        .answer-card { background: #f0fdf4; border: 2px solid #86efac; border-radius: 18px; padding: 20px; margin-bottom: 15px; }
-        .answer-card h3 { margin: 0 0 12px; color: #166534; font-size: 16px; }
-        .step { display: flex; margin-bottom: 10px; align-items: flex-start; }
-        .step-num { background: #22c55e; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; margin-left: 10px; flex-shrink: 0; margin-top: 2px; }
+        .back-btn { color: var(--main); cursor: pointer; font-weight: bold; border: none; background: none; font-size: 14px; padding: 0; margin-bottom: 14px; display: block; }
+        .tag  { background: #dbeafe; color: #1e40af; font-size: 12px; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
+        .tag2 { background: #dcfce7; color: #166534; font-size: 12px; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px; margin-right: 5px; }
+        h2 { font-size: 17px; margin-bottom: 12px; color: #1e293b; }
+        .answer-card { background: #f0fdf4; border: 2px solid #86efac; border-radius: 16px; padding: 18px; margin-bottom: 12px; }
+        .answer-card h3 { color: #166534; font-size: 15px; margin-bottom: 12px; }
+        .step { display: flex; margin-bottom: 10px; align-items: flex-start; gap: 10px; }
+        .step-num { background: #22c55e; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; margin-top: 2px; }
         .step-text { font-size: 14px; color: #14532d; line-height: 1.6; }
-        .tip { background: #fef9c3; border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #713f12; margin-top: 12px; }
-
-        .generic-card { background: #eff6ff; border: 2px solid #93c5fd; border-radius: 18px; padding: 18px; margin-bottom: 15px; font-size: 14px; color: #1e3a8a; line-height: 1.7; }
-        .generic-card h3 { margin: 0 0 10px; color: #1e40af; font-size: 15px; }
-
-        .new-btn { background: #f1f5f9; border: 2px solid #cbd5e1; color: var(--dark); border-radius: 12px; padding: 13px; width: 100%; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .footer { padding: 12px; text-align: center; border-top: 1px solid #f1f5f9; }
-        .footer span { font-size: 12px; color: #94a3b8; }
-
-        .fade-in { animation: fadeIn 0.25s ease; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+        .tip { background: #fef9c3; border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #713f12; margin-top: 10px; }
+        .new-btn { background: #f1f5f9; border: 2px solid #cbd5e1; color: #1e293b; border-radius: 12px; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 5px; }
+        .wa-inline { display: flex; align-items: center; justify-content: center; gap: 8px; background: #25d366; color: white; text-decoration: none; padding: 12px; border-radius: 14px; font-weight: bold; font-size: 14px; margin-bottom: 10px; }
+        .hidden { display: none !important; }
+        .footer { padding: 14px; text-align: center; border-top: 1px solid #f1f5f9; }
+        .wa-btn { display: inline-flex; align-items: center; gap: 7px; background: #25d366; color: white; text-decoration: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
 <div class="app-shell">
-    <div class="header">🛠️ GimlaTech Helper</div>
+    <div class="header">🛠️ GimlaTech Helper<small>כלי עזר למתנדבים</small></div>
     <div class="container">
-
-        <!-- מסך 1 -->
         <div id="s1">
-            <h2 style="font-size:20px;text-align:center;margin-top:5px;">במה אפשר לעזור?</h2>
-            <button class="btn" onclick="go2('pc')">💻&nbsp;&nbsp;מחשב</button>
-            <button class="btn" onclick="go2('phone')">📱&nbsp;&nbsp;טלפון</button>
-            <button class="btn" onclick="go2('extra')">🖨️&nbsp;&nbsp;ציוד היקפי</button>
+            <h2>במה צריך עזרה?</h2>
+            <button class="btn" onclick="go2('pc')">💻 מחשב</button>
+            <button class="btn" onclick="go2('phone')">📱 טלפון</button>
+            <button class="btn" onclick="go2('tablet')">📟 טאבלט</button>
+            <button class="btn" onclick="go2('tv')">📺 טלוויזיה חכמה</button>
+            <button class="btn" onclick="go2('extra')">🖨️ ציוד היקפי</button>
         </div>
-
-        <!-- מסך 2 -->
         <div id="s2" class="hidden">
             <button class="back-btn" onclick="show('s1')">← חזרה</button>
-            <h2 id="os-title" style="font-size:18px;"></h2>
+            <h2 id="os-title"></h2>
             <div id="os-list"></div>
         </div>
-
-        <!-- מסך 3 -->
         <div id="s3" class="hidden">
             <button class="back-btn" onclick="show('s2')">← חזרה</button>
-            <span class="tag" id="ctx-tag"></span>
-            <h2 style="font-size:18px;margin-top:5px;">מה הבעיה?</h2>
-            <div id="problem-list"></div>
-            <div class="free-box">
-                <label>🔍 לא מצאתם? חפשו בחופשיות:</label>
-                <input type="text" id="free-input" placeholder="למשל: המסך שחור..." onkeydown="if(event.key==='Enter')freeSearch()">
-                <button class="btn" style="margin-top:10px;background:#2563eb;color:white;border-color:#2563eb;" onclick="freeSearch()">חיפוש</button>
-            </div>
+            <span class="tag" id="tag-device"></span>
+            <h2>מה הנושא?</h2>
+            <div id="topic-list"></div>
         </div>
-
-        <!-- מסך 4 -->
         <div id="s4" class="hidden">
             <button class="back-btn" onclick="show('s3')">← חזרה</button>
-            <div id="answer-area"></div>
-            <button class="new-btn" onclick="go1()">🔄 בעיה חדשה</button>
+            <span class="tag" id="tag-device2"></span>
+            <span class="tag2" id="tag-topic"></span>
+            <h2>מה הבעיה הספציפית?</h2>
+            <div id="problem-list"></div>
         </div>
-
+        <div id="s5" class="hidden">
+            <button class="back-btn" onclick="show('s4')">← חזרה</button>
+            <div id="answer-area"></div>
+            <button class="new-btn" onclick="show('s1')">🔄 בעיה חדשה</button>
+        </div>
     </div>
     <div class="footer">
-        <a href="https://wa.me/972505396068" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25d366;color:white;text-decoration:none;padding:10px 20px;border-radius:25px;font-weight:bold;font-size:15px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.17 1.535 5.962L.057 23.944l6.107-1.598A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.886 9.886 0 01-5.031-1.378l-.361-.214-3.741.979.999-3.645-.235-.374A9.862 9.862 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.419 0 9.894 4.474 9.894 9.894 0 5.419-4.475 9.894-9.894 9.894z"/></svg>
-            דברו איתנו בוואטסאפ
-        </a>
+        <a class="wa-btn" href="https://wa.me/972505396068" target="_blank">💬 דברו עם גימלאטק</a>
     </div>
 </div>
-
 <script>
-const categories = {
-    pc:    { title:'איזה מחשב?',  types:['💻 Windows (ווינדוס)','🍎 Mac (אפל)'] },
-    phone: { title:'איזה טלפון?', types:['🤖 Android (סמסונג / אחר)','📱 iPhone (אפל)'] },
-    extra: { title:'איזה ציוד?',  types:['🖨️ מדפסת','🔊 רמקולים','🖱️ עכבר / מקלדת'] }
-};
-
-const answers = {
-    "pc|windows|net":  { title:"💻 Windows — האינטרנט לא עובד", steps:["לחצו על סמל הרשת בפינה הימנית התחתונה ובדקו שאתם מחוברים ל-WiFi.","כבו את הנתב (המכשיר עם האנטנות) 30 שניות, הדליקו, המתינו דקה.","אם עדיין לא עובד — הפעילו מחדש את המחשב."], tip:"📞 עדיין לא עובד? צרו קשר עם ספק האינטרנט שלכם." },
-    "pc|windows|power": { title:"💻 Windows — המחשב לא נדלק", steps:["ודאו שכבל החשמל מחובר היטב למחשב ולשקע.","לחצו על כפתור ההפעלה 10 שניות לכיבוי כפוי, ואז הדליקו מחדש.","אם נייד — חברו לחשמל והמתינו 10 דקות לפני שמנסים."], tip:"🔧 אם אין תגובה בכלל — פנו לטכנאי." },
-    "pc|windows|freeze": { title:"💻 Windows — הכל קפוא", steps:["המתינו 2-3 דקות — לפעמים המחשב פשוט עמוס.","לחצו Ctrl + Alt + Delete יחד ← 'מנהל המשימות' ← סגרו תוכניות תקועות.","לחצו על כפתור ההפעלה 10 שניות לכיבוי כפוי, ואז הדליקו."], tip:"💡 מחשב קופא לעתים? שקלו עדכון או ניקוי קבצים." },
-
-    "pc|mac|net":   { title:"🍎 Mac — האינטרנט לא עובד", steps:["לחצו על סמל ה-WiFi בפינה הימנית העליונה ובדקו שמחוברים.","כבו את הנתב 30 שניות, הדליקו, המתינו דקה.","לחצו על תפריט Apple ← 'הפעל מחדש'."], tip:"📞 בעיה ממשיכה? צרו קשר עם ספק האינטרנט." },
-    "pc|mac|power": { title:"🍎 Mac — לא נדלק", steps:["אם נייד — חברו לחשמל, המתינו 10 דקות.","לחצו על כפתור ההפעלה 10 שניות לאיפוס.","נסו: Shift + Control + Option + Power יחד."], tip:"🔧 אין תגובה? פנו לשירות Apple." },
-    "pc|mac|freeze": { title:"🍎 Mac — קפוא", steps:["המתינו מספר דקות.","לחצו Command + Option + Escape לסגירת תוכניות תקועות.","לחצו על כפתור ההפעלה 10 שניות לכיבוי כפוי."], tip:"💡 קופא לעתים? עדכנו את macOS." },
-
-    "phone|android|net":   { title:"🤖 Android — האינטרנט לא עובד", steps:["הגדרות ← WiFi — ודאו שמחוברים לרשת הנכונה.","כבו WiFi 10 שניות ← הפעילו שוב.","אם דאטה: הגדרות ← חיבורים ← ודאו שדאטה סלולרי פעיל."], tip:"📞 בעיה רק באתר אחד? ייתכן שהבעיה באתר, לא בטלפון." },
-    "phone|android|power": { title:"🤖 Android — לא נדלק", steps:["חברו לטעינה 15 דקות לפחות.","לחצו על כפתור ההפעלה 10 שניות.","נסו: כפתור הפעלה + הורדת עוצמה יחד 15 שניות."], tip:"🔋 סוללה מתרוקנת מהר? ייתכן שהיא צריכה החלפה." },
-    "phone|android|freeze": { title:"🤖 Android — קפוא", steps:["לחצו כפתור הפעלה 10 שניות לכיבוי כפוי.","המתינו 10 שניות ← הדליקו.","אם קורה לעתים — מחקו אפליקציות שלא משתמשים בהן."], tip:"💡 אפליקציה מסוימת גורמת לקיפאון? הסירו ותתקינו מחדש." },
-
-    "phone|iphone|net":   { title:"📱 iPhone — האינטרנט לא עובד", steps:["הגדרות ← WiFi — ודאו שמחוברים.","כבו WiFi 10 שניות ← הפעילו שוב.","כבו את האייפון לגמרי, הדליקו ונסו שוב."], tip:"📞 בעיית דאטה? בדקו אם הגעתם למגבלת גלישה חודשית." },
-    "phone|iphone|power": { title:"📱 iPhone — לא נדלק", steps:["חברו לחשמל עם כבל מקורי 15 דקות.","הגבר עוצמה ← הנמך עוצמה ← החזיקו כפתור צד עד לוגו Apple.","אם לא עולה — פנו לחנות Apple."], tip:"🔋 מטען לא מקורי יכול לגרום לבעיות טעינה." },
-    "phone|iphone|freeze": { title:"📱 iPhone — קפוא", steps:["הגבר עוצמה (מהיר) ← הנמך עוצמה (מהיר) ← החזיקו כפתור צד עד כיבוי.","המתינו 10 שניות ← הדליקו.","קורה לעתים? הגדרות ← כללי ← עדכון תוכנה."], tip:"💡 iPhone ישן שקופא הרבה? שקלו שדרוג." },
-
-    "extra|printer|net":   { title:"🖨️ מדפסת — בעיית חיבור", steps:["ודאו שהמדפסת מחוברת לאותו WiFi כמו המחשב.","כבו את המדפסת 30 שניות ← הדליקו.","הגדרות ← מדפסות וסורקים ← מחקו והוסיפו מחדש."], tip:"📶 מדפסת קרובה לנתב עובדת טוב יותר." },
-    "extra|printer|power": { title:"🖨️ מדפסת — לא נדלקת", steps:["ודאו שכבל חשמל מחובר — גם לשקע וגם למדפסת.","נסו שקע חשמל אחר.","בדקו מתג חשמל בגב המדפסת — ודאו שהוא פעיל."], tip:"🔌 חלק מהמדפסות יש מתג גם בגב." },
-    "extra|printer|freeze": { title:"🖨️ מדפסת — תקועה / לא מדפיסה", steps:["כבו ← הדליקו.","בדקו נייר תקוע: פתחו מגש נייר ומשכו בעדינות.","מחשב ← מדפסות וסורקים ← ראה מה מודפס ← מחקו משימות תקועות."], tip:"🖨️ חסר דיו? תוצג הודעה על המסך." },
-
-    "extra|speakers|net":   { title:"🔊 רמקולים — בעיית חיבור", steps:["אם Bluetooth — ודאו שפעיל במחשב/טלפון.","כבו רמקולים 10 שניות ← הדליקו ← התחברו מחדש.","אם קוויים — ודאו שהשקע בשקע הנכון (בד\"כ ירוק)."], tip:"📻 רמקולי Bluetooth לא מחוברים למכשיר אחר?" },
-    "extra|speakers|power": { title:"🔊 רמקולים — לא נדלקים", steps:["ודאו שכבל חשמל מחובר, או שהסוללה טעונה.","בדקו שעוצמת הקול לא מכובה — גם ברמקולים וגם במחשב.","נסו לחבר למכשיר אחר כדי לדעת אם הבעיה ברמקולים."], tip:"🔇 עוצמה נמוכה מדי נראית כ'לא עובד'." },
-    "extra|speakers|freeze": { title:"🔊 רמקולים — אין קול", steps:["לחיצה ימנית על סמל הרמקול ← הגדרות קול ← בחרו את הרמקולים הנכונים.","כבו ← הפעילו רמקולים.","הפעילו מחדש מחשב — עדכונים לפעמים מכבים קול."], tip:"🎵 בעיה בסרטון ספציפי או בכל הקולות?" },
-
-    "extra|mouse|net":   { title:"🖱️ עכבר/מקלדת — בעיית חיבור", steps:["אלחוטיים? בדקו ← החליפו סוללות.","נתקו את המקלט (dongle) מה-USB ← חברו ביציאה אחרת.","נסו יציאת USB שונה."], tip:"🔋 עכבר/מקלדת אלחוטיים — החליפו סוללה כל כמה חודשים." },
-    "extra|mouse|power": { title:"🖱️ עכבר/מקלדת — לא עובד", steps:["בדקו שהכבל מחובר היטב, או שהסוללות תקינות.","נסו יציאת USB אחרת.","נסו במחשב אחר כדי לאשר שהמכשיר עצמו תקין."], tip:"🖱️ עכבר לא נע? נסו משטח אחר — לא זכוכית." },
-    "extra|mouse|freeze": { title:"🖱️ עכבר/מקלדת — קופא / מגיב לאט", steps:["נתקו 10 שניות ← חברו מחדש.","הפעילו מחדש את המחשב.","נקו את תחתית העכבר בעדינות עם בד יבש."], tip:"🧹 לכלוך תחת העכבר הוא סיבה נפוצה לתגובה איטית." }
-};
-
-let selDevice = '', selOS = '';
-
-function show(id) {
-    ['s1','s2','s3','s4'].forEach(s =>
-        document.getElementById(s).classList.toggle('hidden', s !== id)
-    );
-}
-
-function go1() {
-    selDevice = ''; selOS = '';
-    document.getElementById('free-input').value = '';
-    show('s1');
-}
-
-function go2(device) {
-    selDevice = device;
-    const cat = categories[device];
-    document.getElementById('os-title').innerText = cat.title;
-    const list = document.getElementById('os-list');
-    list.innerHTML = '';
-    cat.types.forEach(type => {
-        const b = document.createElement('button');
-        b.className = 'btn';
-        b.textContent = type;
-        b.onclick = () => go3(type);
-        list.appendChild(b);
-    });
-    show('s2');
-}
-
-function go3(os) {
-    selOS = os;
-    document.getElementById('ctx-tag').textContent = os;
-    document.getElementById('free-input').value = '';
-    const problems = ['🌐 האינטרנט לא עובד','🔌 המכשיר לא נדלק','❄️ הכל קפוא / תקוע'];
-    const list = document.getElementById('problem-list');
-    list.innerHTML = '';
-    problems.forEach(p => {
-        const b = document.createElement('button');
-        b.className = 'btn';
-        b.textContent = p;
-        b.onclick = () => showAnswer(p);
-        list.appendChild(b);
-    });
-    show('s3');
-}
-
-function getKey(os, problem) {
-    let osKey = '';
-    if (/windows/i.test(os))  osKey = 'windows';
-    else if (/mac/i.test(os)) osKey = 'mac';
-    else if (/android/i.test(os)) osKey = 'android';
-    else if (/iphone/i.test(os)) osKey = 'iphone';
-    else if (/מדפסת/.test(os)) osKey = 'printer';
-    else if (/רמקולים/.test(os)) osKey = 'speakers';
-    else if (/עכבר/.test(os)) osKey = 'mouse';
-
-    let probKey = '';
-    if (/אינטרנט|רשת|חיבור/.test(problem))   probKey = 'net';
-    else if (/נדלק|כוח|חשמל/.test(problem))   probKey = 'power';
-    else if (/קפוא|תקוע|מגיב/.test(problem))  probKey = 'freeze';
-
-    const devKey = selDevice === 'extra' ? 'extra' : 'pc|phone'.includes(selDevice) ? selDevice : selDevice;
-    return `${selDevice}|${osKey}|${probKey}`;
-}
-
-function showAnswer(problem) {
-    const key = getKey(selOS, problem);
-    const data = answers[key];
-    const area = document.getElementById('answer-area');
-
-    if (data) {
-        const stepsHTML = data.steps.map((s, i) =>
-            `<div class="step"><div class="step-num">${i+1}</div><div class="step-text">${s}</div></div>`
-        ).join('');
-        area.innerHTML = `<div class="answer-card fade-in"><h3>${data.title}</h3>${stepsHTML}<div class="tip">${data.tip}</div></div>`;
-    } else {
-        area.innerHTML = `<div class="generic-card fade-in"><h3>💡 עצה כללית</h3>הפעולה הראשונה תמיד: <strong>כבו את המכשיר, המתינו 30 שניות, הדליקו מחדש.</strong><br><br>אם לא עוזר — פנו לנציג שירות טכני.</div>`;
-    }
-    show('s4');
-}
-
-function freeSearch() {
-    const q = document.getElementById('free-input').value.trim();
-    if (!q) return;
-
-    let matched = '';
-    if (/אינטרנט|רשת|wifi|חיבור|אתר/.test(q))     matched = '🌐 האינטרנט לא עובד';
-    else if (/נדלק|כוח|חשמל|לא עולה|מת/.test(q))   matched = '🔌 המכשיר לא נדלק';
-    else if (/קפוא|תקוע|לא מגיב|איטי/.test(q))      matched = '❄️ הכל קפוא / תקוע';
-
-    if (matched) {
-        showAnswer(matched);
-    } else {
-        const area = document.getElementById('answer-area');
-        area.innerHTML = `<div class="generic-card fade-in"><h3>🔍 "${q}"</h3>לא מצאנו תשובה מדויקת, אבל הנה עצת הזהב:<br><br>✅ <strong>כבו את המכשיר לגמרי — המתינו 30 שניות — הדליקו מחדש.</strong><br><br>פתרון זה עוזר ב-70% מהמקרים! אם לא עוזר — פנו לנציג שירות טכני.</div>`;
-        show('s4');
-    }
-}
+var categories={pc:{title:"איזה מחשב?",types:["💻 Windows","🍎 Mac"]},phone:{title:"איזה טלפון?",types:["🤖 Android","📱 iPhone"]},tablet:{title:"איזה טאבלט?",types:["🤖 Android / Samsung","📱 iPad (אפל)","🪟 Surface (Microsoft)"]},tv:{title:"איזה טלוויזיה?",types:["📺 Smart TV (Samsung/LG)","📡 Apple TV","🎮 Chromecast / Fire Stick"]},extra:{title:"איזה ציוד?",types:["🖨️ מדפסת","🔊 רמקולים","🖱️ עכבר / מקלדת","📷 מצלמה / וובקאם"]}};
+var topics={"windows":["🌐 אינטרנט וחיבור","⚡ הפעלה וכיבוי","❄️ ביצועים ותקיעות","🔊 קול ומסך","📧 דואר ואפליקציות","🔒 סיסמאות ואבטחה","📷 וידאו שיחות","🖨️ הדפסה"],"mac":["🌐 אינטרנט וחיבור","⚡ הפעלה וכיבוי","❄️ ביצועים ותקיעות","🔊 קול ומסך","📧 דואר ואפליקציות","🔒 סיסמאות ואבטחה","📷 וידאו שיחות","🖨️ הדפסה"],"android":["🌐 אינטרנט וחיבור","⚡ הפעלה וטעינה","❄️ ביצועים ותקיעות","🔊 קול ומסך","📧 דואר ואפליקציות","🔒 סיסמאות ואבטחה","📷 וידאו שיחות","📸 תמונות וגלריה"],"iphone":["🌐 אינטרנט וחיבור","⚡ הפעלה וטעינה","❄️ ביצועים ותקיעות","🔊 קול ומסך","📧 דואר ואפליקציות","🔒 סיסמאות ואבטחה","📷 וידאו שיחות","📸 תמונות וגלריה"],"android / samsung":["🌐 אינטרנט וחיבור","⚡ הפעלה וטעינה","❄️ ביצועים","🔊 קול ומסך","📷 וידאו שיחות"],"ipad (אפל)":["🌐 אינטרנט וחיבור","⚡ הפעלה וטעינה","❄️ ביצועים","🔊 קול ומסך","📷 וידאו שיחות"],"surface (microsoft)":["🌐 אינטרנט וחיבור","⚡ הפעלה","❄️ ביצועים","🔊 קול ומסך"],"smart tv (samsung/lg)":["🌐 אינטרנט וחיבור","⚡ הפעלה","🔊 קול ותמונה","📺 אפליקציות ושלט"],"apple tv":["🌐 אינטרנט וחיבור","⚡ הפעלה","🔊 קול ותמונה","📺 אפליקציות ושלט"],"chromecast / fire stick":["🌐 אינטרנט וחיבור","⚡ הפעלה","🔊 קול ותמונה"],"מדפסת":["🌐 חיבור למדפסת","⚡ לא נדלקת","🖨️ לא מדפיסה","🖨️ איכות הדפסה"],"רמקולים":["🌐 חיבור","⚡ לא נדלקים","🔊 אין קול"],"עכבר / מקלדת":["🌐 חיבור","⚡ לא עובד","🖱️ עובד בצורה לא תקינה"],"מצלמה / וובקאם":["🌐 חיבור","📷 לא מזוהה","📷 תמונה לא ברורה"]};
+var problems={"windows|אינטרנט וחיבור":["WiFi לא מתחבר","האינטרנט איטי","דף לא נפתח","WiFi נפל פתאום"],"windows|הפעלה וכיבוי":["המחשב לא נדלק","המחשב לא נכבה","מסך שחור בהפעלה","Windows לא עולה"],"windows|ביצועים ותקיעות":["הכל קפוא / תקוע","המחשב איטי מאוד","תוכנה לא נסגרת","הכונן הקשיח מלא"],"windows|קול ומסך":["אין קול בכלל","הקול עובד חלקית","המסך לא מציג תמונה","רזולוציה שגויה"],"windows|דואר ואפליקציות":["Outlook לא נפתח","לא מקבל מיילים","בעיה בהתקנת אפליקציה","האפליקציה קורסת"],"windows|סיסמאות ואבטחה":["שכחתי סיסמת Windows","חשבון נחסם","חשד לוירוס / הונאה","עדכון Windows תקוע"],"windows|וידאו שיחות":["זום לא עובד","המצלמה לא נפתחת","WhatsApp Web לא עובד","הצד השני לא שומע אותי"],"windows|הדפסה":["המדפסת לא מגיבה","הדפסה תקועה בתור","המדפסת לא מזוהה","איכות הדפסה גרועה"],"mac|אינטרנט וחיבור":["WiFi לא מתחבר","האינטרנט איטי","Safari לא עובד","WiFi נפל פתאום"],"mac|הפעלה וכיבוי":["ה-Mac לא נדלק","מסך שחור","Mac קפוא בהפעלה","גלגל מסתובב (spinning wheel)"],"mac|ביצועים ותקיעות":["Mac איטי מאוד","הכל קפוא","תוכנה תקועה","נגמר מקום בדיסק"],"mac|קול ומסך":["אין קול","בעיית מסך / רזולוציה","AirPlay לא עובד","אוזניות לא מזוהות"],"mac|דואר ואפליקציות":["Mail לא עובד","לא מקבל מיילים","בעיה בהתקנת אפליקציה","אפליקציה קורסת"],"mac|סיסמאות ואבטחה":["שכחתי סיסמת Mac","Apple ID נחסם","חשד לוירוס","עדכון macOS תקוע"],"mac|וידאו שיחות":["FaceTime לא עובד","זום — המצלמה לא עובדת","הצד השני לא שומע","WhatsApp Web לא עובד"],"mac|הדפסה":["המדפסת לא מגיבה","הדפסה תקועה","המדפסת לא מזוהה","איכות גרועה"],"android|אינטרנט וחיבור":["WiFi לא מתחבר","דאטה לא עובד","האינטרנט איטי","אפליקציה לא מתחברת"],"android|הפעלה וטעינה":["הטלפון לא נדלק","לא טוען / טוען לאט","הטלפון כובה לבד","מסך שחור"],"android|ביצועים ותקיעות":["הטלפון קפוא","הטלפון איטי","אפליקציה קורסת","נגמר מקום בטלפון"],"android|קול ומסך":["אין קול","הרמקול לא עובד","המסך לא מגיב למגע","בעיית בהירות מסך"],"android|דואר ואפליקציות":["Gmail לא עובד","לא מקבל מיילים","אפליקציה לא מתקינה","אפליקציה קורסת"],"android|סיסמאות ואבטחה":["שכחתי קוד פינים","חשבון Google נחסם","חשד להונאה / וירוס","עדכון לא מסתיים"],"android|וידאו שיחות":["WhatsApp — מצלמה לא עובדת","זום לא עובד","הצד השני לא שומע","שיחת וידאו נופלת"],"android|תמונות וגלריה":["תמונות נעלמו","לא מצליח לשלוח תמונה","גלריה לא נפתחת","איך מעביר תמונות למחשב"],"iphone|אינטרנט וחיבור":["WiFi לא מתחבר","דאטה לא עובד","האינטרנט איטי","Safari לא עובד"],"iphone|הפעלה וטעינה":["האייפון לא נדלק","לא טוען","הטלפון כובה לבד","מסך שחור"],"iphone|ביצועים ותקיעות":["האייפון קפוא","איטי מאוד","אפליקציה קורסת","נגמר מקום"],"iphone|קול ומסך":["אין קול","רמקול לא עובד","המסך לא מגיב","בעיית בהירות"],"iphone|דואר ואפליקציות":["Mail לא עובד","לא מקבל מיילים","אפליקציה לא מתקינה","אפליקציה קורסת"],"iphone|סיסמאות ואבטחה":["שכחתי קוד","Apple ID נחסם","חשד להונאה","עדכון iOS תקוע"],"iphone|וידאו שיחות":["FaceTime לא עובד","WhatsApp וידאו לא עובד","הצד השני לא שומע","המצלמה לא נפתחת"],"iphone|תמונות וגלריה":["תמונות נעלמו","לא מצליח לשלוח תמונה","iCloud מלא","איך מעביר למחשב"]};
+var answers={"windows|אינטרנט וחיבור|wifi לא מתחבר":{title:"💻 WiFi לא מתחבר — Windows",steps:["לחצו על סמל הרשת (פינה ימנית תחתונה) ← בחרו רשת WiFi ← התחברו.","לחצו ימני על סמל הרשת ← פתרון בעיות.","כבו נתב 30 שניות ← הדליקו ← המתינו דקה."],tip:"📞 שאר המכשירים מחוברים? הבעיה במחשב. כולם לא? בנתב/ספק."},"windows|אינטרנט וחיבור|האינטרנט איטי":{title:"💻 אינטרנט איטי — Windows",steps:["סגרו תוכניות רבות הפתוחות (YouTube, עדכונים ברקע).","כבו וחברו מחדש את ה-WiFi.","הפעילו מחדש את הנתב — כבו 30 שניות."],tip:"💡 מחשב קרוב לנתב = אינטרנט מהיר יותר."},"windows|אינטרנט וחיבור|דף לא נפתח":{title:"💻 דף לא נפתח — Windows",steps:["נסו google.com — אם נפתח, הבעיה באתר הספציפי.","נסו דפדפן אחר (Chrome, Edge, Firefox).","Ctrl+Shift+Delete ← מחקו קבצים זמניים."],tip:"🔄 לפעמים רענון (F5) פותר הכל."},"windows|אינטרנט וחיבור|wifi נפל פתאום":{title:"💻 WiFi נפל — Windows",steps:["סמל רשת ← בחרו רשת ← התחברו.","כבו WiFi 10 שניות ← הפעילו.","הפעילו מחדש את המחשב."],tip:"📡 נופל תמיד? הנתב ייתכן רחוק מדי."},"windows|הפעלה וכיבוי|המחשב לא נדלק":{title:"💻 לא נדלק — Windows",steps:["ודאו שכבל חשמל מחובר היטב לשקע ולמחשב.","לחצו כפתור הפעלה 10 שניות ← הדליקו מחדש.","נייד? חברו לחשמל 15 דקות לפני שמנסים."],tip:"🔧 אין תגובה בכלל? פנו לטכנאי."},"windows|הפעלה וכיבוי|המחשב לא נכבה":{title:"💻 לא נכבה — Windows",steps:["Start ← 🔴 ← כיבוי. המתינו 2 דקות.","אם לא מגיב — כפתור הפעלה 10 שניות.","הפעילו מחדש ובדקו עדכונים ממתינים."],tip:"💡 עדכון Windows מאריך לפעמים את הכיבוי — המתינו."},"windows|הפעלה וכיבוי|מסך שחור בהפעלה":{title:"💻 מסך שחור — Windows",steps:["ודאו שמסך חיצוני דלוק ומחובר.","Win+Ctrl+Shift+B לאיפוס תצוגה.","כיבוי כפוי (10 שניות) ← הדליקו."],tip:"🖥️ מסך חיצוני? נסו Win+P ובחרו מצב תצוגה."},"windows|הפעלה וכיבוי|windows לא עולה":{title:"💻 Windows לא עולה",steps:["כיבוי כפוי 3 פעמים ← Windows ינסה לתקן אוטומטית.","מסך כחול? רשמו קוד שגיאה ופנו לגימלאטק.","עולה אבל איטי? המתינו — ייתכן שעדכון רץ ברקע."],tip:"📞 מסך כחול קבוע = פנו לטכנאי."},"windows|ביצועים ותקיעות|הכל קפוא / תקוע":{title:"💻 קפוא — Windows",steps:["המתינו 3 דקות — לפעמים Windows עמוס זמנית.","Ctrl+Alt+Delete ← מנהל משימות ← סיימו תוכניות עם CPU גבוה.","כיבוי כפוי: כפתור הפעלה 10 שניות ← הדליקו."],tip:"💡 קופא לעתים? בדקו אם יש עדכונים ממתינים."},"windows|ביצועים ותקיעות|המחשב איטי מאוד":{title:"💻 איטי מאוד — Windows",steps:["הפעילו מחדש — לרוב זה עוזר.","Ctrl+Alt+Delete ← מנהל משימות ← סגרו תוכניות מיותרות.","בדקו מקום פנוי: C: ← לא פחות מ-10GB."],tip:"🐢 מחשב ישן עם Windows 11 עלול להיות איטי — שקלו שדרוג."},"windows|ביצועים ותקיעות|תוכנה לא נסגרת":{title:"💻 תוכנה תקועה — Windows",steps:["המתינו 30 שניות.","לחצו ימני על הסמל בשורת המשימות ← סגור חלון.","Ctrl+Alt+Delete ← מנהל משימות ← מצאו תוכנה ← סיים משימה."],tip:"💡 תוכנה שתוקעת תמיד? הסירו והתקינו מחדש."},"windows|ביצועים ותקיעות|הכונן הקשיח מלא":{title:"💻 אין מקום — Windows",steps:["סייר הקבצים ← ימני על C: ← מאפיינים ← ניקוי דיסק.","רוקנו סל המחזור: ימני ← רוקן סל.","העבירו תמונות/סרטים לכונן חיצוני."],tip:"📁 פחות מ-10GB פנויים = המחשב מאט."},"windows|קול ומסך|אין קול בכלל":{title:"💻 אין קול — Windows",steps:["ודאו שעוצמת קול לא מכובה (סמל רמקול פינה ימנית תחתונה).","ימני על סמל רמקול ← הגדרות קול ← בחרו מכשיר נכון.","הפעילו מחדש — עדכונים לפעמים מכבים קול."],tip:"🎧 אוזניות מחוברות? הקול עלול להיות מופנה אליהן."},"windows|קול ומסך|המסך לא מציג תמונה":{title:"💻 בעיית מסך — Windows",steps:["ודאו שכבל HDMI/VGA מחובר היטב — הוציאו והכניסו.","Win+P ← בחרו רק מסך מחשב או שכפל.","הפעילו מחדש."],tip:"🖥️ מסך חיצוני? ודאו שדלוק ועל הקלט הנכון."},"windows|דואר ואפליקציות|outlook לא נפתח":{title:"💻 Outlook תקוע — Windows",steps:["המתינו 30 שניות — לפעמים טוען לאט.","סגרו ממנהל משימות ← פתחו מחדש.","הפעילו מחדש את המחשב."],tip:"📧 בעיה קבועה? נסו outlook.com מהדפדפן."},"windows|דואר ואפליקציות|לא מקבל מיילים":{title:"💻 לא מגיעים מיילים — Windows",steps:["בדקו תיקיית ספאם/זבל.","ודאו שיש אינטרנט.","בדקו דרך דפדפן: gmail.com / outlook.com."],tip:"📬 מגיע בדפדפן אבל לא ב-Outlook? הבעיה בהגדרות."},"windows|דואר ואפליקציות|בעיה בהתקנת אפליקציה":{title:"💻 התקנה לא עובדת",steps:["ודאו שיש מקום בדיסק (לפחות 2GB פנויים).","ימני על הקובץ ← הפעל כמנהל.","כבו אנטי-וירוס זמנית ← נסו שוב ← הפעילו שוב!"],tip:"⚠️ הורידו תוכנות רק מאתרים רשמיים."},"windows|דואר ואפליקציות|האפליקציה קורסת":{title:"💻 אפליקציה קורסת",steps:["סגרו לגמרי ← פתחו מחדש.","הפעילו מחדש את המחשב.","הגדרות ← אפליקציות ← מצאו ← תיקון."],tip:"🔄 ממשיך? הסירו והתקינו מחדש."},"windows|סיסמאות ואבטחה|שכחתי סיסמת windows":{title:"💻 שכחתי סיסמה — Windows",steps:["מסך כניסה ← שכחתי את ה-PIN ← אפסו דרך Microsoft.","חשבון מקומי? F8 בהפעלה ← מצב בטוח ← אפסו.","פנו לגימלאטק — איפוס דורש זהירות."],tip:"🔑 כדאי לרשום סיסמאות במקום בטוח."},"windows|סיסמאות ואבטחה|חשד לוירוס / הונאה":{title:"💻 חשד לוירוס/הונאה",steps:["אל תלחצו על שום דבר! סגרו דפדפן (Alt+F4).","אל תתקשרו למספרים על המסך — אלה הונאות!","הגדרות ← אבטחה ← Windows Security ← סריקה מהירה."],tip:"🚨 קיבלתם שיחה שהמחשב נפרץ? זו הונאה — נתקו!"},"windows|סיסמאות ואבטחה|עדכון windows תקוע":{title:"💻 עדכון תקוע — Windows",steps:["המתינו — עדכונים גדולים לוקחים שעה ויותר.","תקוע מעל שעתיים? כיבוי כפוי (10 שניות) ← הדליקו.","Windows ינסה לסיים בהפעלה הבאה."],tip:"💡 השאירו מחשב מחובר לחשמל בזמן עדכון."},"windows|וידאו שיחות|זום לא עובד":{title:"💻 זום לא עובד",steps:["סגרו ← פתחו מחדש.","ודאו שיש אינטרנט.","הגדרות זום ← וידאו/אודיו ← בחרו מצלמה ומיקרופון נכונים."],tip:"📷 מצלמה תפוסה? סגרו Teams/Skype."},"windows|וידאו שיחות|המצלמה לא נפתחת":{title:"💻 מצלמה לא עובדת",steps:["הגדרות ← פרטיות ← מצלמה ← ודאו שמופעלת לאפליקציות.","הפעילו מחדש את המחשב.","מנהל ההתקנים ← מצלמות ← ימני ← עדכן מנהל התקן."],tip:"🔒 Windows חוסם מצלמה לפני קבלת הרשאה."},"windows|וידאו שיחות|הצד השני לא שומע אותי":{title:"💻 מיקרופון לא עובד",steps:["ודאו שמיקרופון לא מושתק (סמל 🎙 באפליקציה).","הגדרות ← מערכת ← קול ← קלט ← בחרו מיקרופון נכון.","בזום: הגדרות ← אודיו ← בדיקת מיקרופון."],tip:"🎤 אוזניות עם מיקרופון? ודאו שמחוברות היטב."},"windows|וידאו שיחות|whatsapp web לא עובד":{title:"💻 WhatsApp Web",steps:["פתחו whatsapp.com ← סרקו QR עם הטלפון.","ודאו שהטלפון מחובר לאינטרנט.","נסו דפדפן אחר (Chrome מומלץ)."],tip:"📱 WhatsApp Web דורש שהטלפון יהיה מחובר לאינטרנט."},"windows|הדפסה|המדפסת לא מגיבה":{title:"💻 מדפסת לא מגיבה",steps:["כבו מדפסת ← 30 שניות ← הדליקו.","ודאו שמחוברת לאותו WiFi כמו המחשב.","הגדרות ← מדפסות וסורקים ← הגדר כברירת מחדל."],tip:"📡 קרבה לנתב = חיבור יציב."},"windows|הדפסה|הדפסה תקועה בתור":{title:"💻 תור הדפסה תקוע",steps:["הגדרות ← מדפסות ← ראה מה מודפס.","מחקו את כל המשימות בתור.","הפעילו מחדש מחשב ומדפסת."],tip:"🖨️ אחרי ניקוי התור — נסו שוב."},"mac|אינטרנט וחיבור|wifi לא מתחבר":{title:"🍎 WiFi לא מתחבר — Mac",steps:["סמל WiFi (פינה ימנית עליונה) ← בחרו רשת ← הצטרפו.","כבו WiFi 10 שניות ← הפעילו שוב.","Apple ← הפעל מחדש."],tip:"📞 שאר המכשירים מחוברים? הבעיה ב-Mac."},"mac|הפעלה וכיבוי|ה-mac לא נדלק":{title:"🍎 Mac לא נדלק",steps:["נייד? חברו לחשמל 10 דקות.","לחצו כפתור הפעלה 10 שניות.","Shift+Control+Option+Power יחד לאיפוס."],tip:"🔧 אין תגובה? פנו לשירות Apple."},"mac|ביצועים ותקיעות|הכל קפוא":{title:"🍎 קפוא — Mac",steps:["המתינו מספר דקות.","Command+Option+Escape ← סגרו תוכניות תקועות.","כפתור הפעלה 10 שניות לכיבוי כפוי."],tip:"💡 קופא לעתים? עדכנו את macOS."},"mac|וידאו שיחות|facetime לא עובד":{title:"🍎 FaceTime לא עובד",steps:["הגדרות ← FaceTime ← ודאו שמופעל.","ודאו שיש אינטרנט.","כבו ← הדליקו Mac."],tip:"📞 FaceTime עובד רק בין מכשירי Apple."},"android|אינטרנט וחיבור|wifi לא מתחבר":{title:"🤖 WiFi לא מתחבר — Android",steps:["הגדרות ← WiFi ← בחרו רשת ← הכניסו סיסמה.","כבו WiFi 10 שניות ← הפעילו שוב.","כבו נתב 30 שניות ← הדליקו."],tip:"🔑 שכחתם סיסמת WiFi? בדקו בגב הנתב."},"android|הפעלה וטעינה|הטלפון לא נדלק":{title:"🤖 לא נדלק — Android",steps:["חברו לטעינה 15 דקות.","לחצו כפתור הפעלה 10 שניות.","הפעלה + הורדת עוצמה יחד 15 שניות."],tip:"🔋 סוללה מתרוקנת מהר? ייתכן שצריכה החלפה."},"android|ביצועים ותקיעות|הטלפון קפוא":{title:"🤖 קפוא — Android",steps:["כפתור הפעלה 10 שניות לכיבוי כפוי.","המתינו 10 שניות ← הדליקו.","קורה לעתים? מחקו אפליקציות שלא משתמשים."],tip:"💡 אפליקציה מסוימת גורמת? הסירו ותתקינו מחדש."},"android|וידאו שיחות|whatsapp — מצלמה לא עובדת":{title:"🤖 WhatsApp מצלמה — Android",steps:["הגדרות ← אפליקציות ← WhatsApp ← הרשאות ← הפעילו מצלמה.","סגרו WhatsApp ← פתחו מחדש.","הפעילו מחדש את הטלפון."],tip:"📷 אפליקציה אחרת פתוחה עם המצלמה? סגרו אותה."},"android|תמונות וגלריה|תמונות נעלמו":{title:"🤖 תמונות נעלמו — Android",steps:["גלריה ← אלבומים ← בדקו שם.","בדקו לאחרונה נמחקו — נשמר 30 יום.","פתחו Google Photos — ייתכן שיש שם גיבוי."],tip:"☁️ Google Photos — גיבוי חינמי לכל התמונות!"},"iphone|אינטרנט וחיבור|wifi לא מתחבר":{title:"📱 WiFi לא מתחבר — iPhone",steps:["הגדרות ← WiFi ← בחרו רשת ← הכניסו סיסמה.","כבו WiFi 10 שניות ← הפעילו.","כבו אייפון ← הדליקו ← נסו שוב."],tip:"🔑 שכחתם סיסמת WiFi? בדקו בגב הנתב."},"iphone|הפעלה וטעינה|האייפון לא נדלק":{title:"📱 לא נדלק — iPhone",steps:["חברו לחשמל עם כבל מקורי 15 דקות.","הגבר עוצמה (מהיר) ← הנמך עוצמה (מהיר) ← החזיקו כפתור צד עד לוגו Apple.","אם לא עולה — פנו לחנות Apple."],tip:"🔋 מטען לא מקורי יכול לגרום לבעיות."},"iphone|ביצועים ותקיעות|האייפון קפוא":{title:"📱 קפוא — iPhone",steps:["הגבר עוצמה (מהיר) ← הנמך עוצמה (מהיר) ← החזיקו כפתור צד עד כיבוי.","המתינו 10 שניות ← הדליקו.","קורה לעתים? הגדרות ← כללי ← עדכון תוכנה."],tip:"💡 iPhone ישן שקופא הרבה? שקלו שדרוג."},"iphone|וידאו שיחות|facetime לא עובד":{title:"📱 FaceTime לא עובד",steps:["הגדרות ← FaceTime ← ודאו שמופעל.","ודאו שיש אינטרנט.","כבו ← הדליקו אייפון."],tip:"📞 FaceTime עובד רק בין מכשירי Apple."},"iphone|תמונות וגלריה|icloud מלא":{title:"📱 iCloud מלא — iPhone",steps:["הגדרות ← שמכם ← iCloud ← ניהול אחסון ← מחקו גיבויים ישנים.","מחקו תמונות כפולות.","50GB ב-₪4/חודש — או עברו ל-Google Photos (חינם)."],tip:"💡 Google Photos: חלופה חינמית מצוינת."}};
+var defaultAnswer={title:"💡 עצה כללית",steps:["כבו את המכשיר לגמרי — המתינו 30 שניות — הדליקו מחדש.","ודאו שיש חיבור אינטרנט תקין.","אם הבעיה ממשיכה — פנו לגימלאטק בוואטסאפ."],tip:"📞 70% מהבעיות נפתרות בהפעלה מחדש!"};
+var selDevice='',selOS='',selTopic='';
+function show(id){['s1','s2','s3','s4','s5'].forEach(function(s){document.getElementById(s).classList.toggle('hidden',s!==id);});}
+function clean(s){return s.replace(/[💻🍎🤖📱🪟📺📡🎮🖨️🔊🖱️📷⚡❄️🔒📧📸🌐]/g,'').trim().toLowerCase();}
+function go2(device){selDevice=device;var cat=categories[device];document.getElementById('os-title').innerText=cat.title;var list=document.getElementById('os-list');list.innerHTML='';cat.types.forEach(function(type){var b=document.createElement('button');b.className='btn';b.textContent=type;b.onclick=function(){go3(type);};list.appendChild(b);});show('s2');}
+function go3(os){selOS=os;var osKey=clean(os);document.getElementById('tag-device').textContent=os;document.getElementById('tag-device2').textContent=os;var topicList=topics[osKey]||topics['windows'];var list=document.getElementById('topic-list');list.innerHTML='';topicList.forEach(function(topic){var b=document.createElement('button');b.className='btn';b.textContent=topic;b.onclick=function(){go4(topic);};list.appendChild(b);});show('s3');}
+function go4(topic){selTopic=topic;var osKey=clean(selOS);var topicKey=clean(topic);document.getElementById('tag-topic').textContent=topic;var probKey=osKey+'|'+topicKey;var probList=problems[probKey];var list=document.getElementById('problem-list');list.innerHTML='';if(!probList){showAnswer(topic);return;}probList.forEach(function(prob){var b=document.createElement('button');b.className='btn';b.textContent=prob;b.onclick=function(){showAnswer(prob);};list.appendChild(b);});var wa=document.createElement('a');wa.href='https://wa.me/972505396068';wa.target='_blank';wa.className='btn';wa.style.color='#25d366';wa.style.borderColor='#25d366';wa.textContent='❓ לא מצאתי — שלחו לגימלאטק';list.appendChild(wa);show('s4');}
+function showAnswer(problem){var osKey=clean(selOS);var topicKey=clean(selTopic);var probKey=osKey+'|'+topicKey+'|'+problem.toLowerCase();var data=answers[probKey]||defaultAnswer;var stepsHTML=data.steps.map(function(s,i){return '<div class="step"><div class="step-num">'+(i+1)+'</div><div class="step-text">'+s+'</div></div>';}).join('');document.getElementById('answer-area').innerHTML='<div class="answer-card"><h3>'+data.title+'</h3>'+stepsHTML+'<div class="tip">'+data.tip+'</div></div><a class="wa-inline" href="https://wa.me/972505396068" target="_blank">עדיין לא פתור? דברו עם גימלאטק 💬</a>';show('s5');}
 </script>
 </body>
 </html>
