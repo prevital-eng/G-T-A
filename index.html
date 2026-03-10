@@ -2,96 +2,94 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GimlaTech Helper</title>
-    <!-- Tailwind CSS for styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React and ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel for JSX transformation -->
+    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
+    <!-- Lucide Icons (Universal) -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/lucide-react@latest"></script>
     
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap');
+        body { 
+            font-family: 'Assistant', system-ui, -apple-system, sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
         .animate-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useRef } = React;
-        const { 
-            Monitor, Smartphone, Camera, ChevronLeft, AlertCircle, 
-            Printer, MousePointer2, Volume2, Laptop, Cpu, 
-            Send, MessageSquare, HelpCircle, Share2, Copy, Check, Info
-        } = lucide;
+        const { useState, useRef, useEffect } = React;
 
-        const DATA_TREE = {
+        const DATA = {
             computer: {
                 label: 'מחשב',
-                icon: <Monitor size={24} />,
+                icon: 'monitor',
                 systems: {
                     windows: {
                         label: 'Windows',
-                        icon: <Monitor size={20} className="text-blue-600" />,
+                        icon: 'monitor',
+                        color: 'text-blue-600',
                         issues: [
-                            { title: 'המחשב איטי מאוד', steps: ['🔄 בצעו הפעלה מחדש (Restart).', '❌ סגרו חלונות ותוכנות מיותרות.', '⚙️ בדקו עדכוני מערכת בהגדרות (Windows Update).'] },
-                            { title: 'אין אינטרנט', steps: ['🌐 ודאו ש-Wi-Fi דולק.', '🔌 נתקו את הראוטר מהחשמל ל-10 שניות וחברו שוב.', '📶 ודאו שאינכם במצב טיסה.'] },
-                            { title: 'המסך קפוא', steps: ['⌨️ לחצו יחד Ctrl + Alt + Delete.', '🔋 לחיצה ארוכה (10 שניות) על כפתור הכיבוי הפיזי.'] }
+                            { title: 'המחשב איטי מאוד', steps: ['🔄 בצעו הפעלה מחדש (Restart).', '❌ סגרו תוכנות מיותרות.', '⚙️ בדקו עדכוני מערכת בהגדרות.'] },
+                            { title: 'האינטרנט לא עובד', steps: ['🌐 ודאו ש-Wi-Fi דולק.', '🔌 נתקו וחברו את הראוטר מהחשמל.', '📶 בדקו אם המחשב ב-"מצב טיסה".'] }
                         ]
                     },
                     mac: {
-                        label: 'Mac',
-                        icon: <Laptop size={20} className="text-gray-700" />,
+                        label: 'Mac (אפל)',
+                        icon: 'laptop',
+                        color: 'text-gray-700',
                         issues: [
-                            { title: 'תוכנה לא נסגרת', steps: ['⌨️ לחצו Command + Option + Escape.', '🔴 בחרו בתוכנה ולחצו "Force Quit".'] },
-                            { title: 'המחשב מתחמם', steps: ['🌬️ ודאו שפתחי האוורור לא חסומים.', '❌ סגרו תוכנות כבדות שפועלות ברקע.'] }
+                            { title: 'תוכנה לא נסגרת', steps: ['⌨️ לחצו Command + Option + Escape.', '🔴 בחרו בתוכנה ולחצו Force Quit.'] }
                         ]
                     }
                 }
             },
             phone: {
                 label: 'טלפון',
-                icon: <Smartphone size={24} />,
+                icon: 'smartphone',
                 systems: {
                     android: {
                         label: 'אנדרואיד',
-                        icon: <Smartphone size={20} className="text-green-600" />,
+                        icon: 'smartphone',
+                        color: 'text-green-600',
                         issues: [
-                            { title: 'הסוללה נגמרת מהר', steps: ['☀️ הנמיכו את בהירות המסך.', '🔋 הפעילו "מצב חיסכון בסוללה" בהגדרות.', '📍 כבו את ה-GPS (מיקום) כשאין בו צורך.'] }
+                            { title: 'הסוללה נגמרת מהר', steps: ['☀️ הנמיכו בהירות מסך.', '🔋 הפעילו "מצב חיסכון בסוללה".'] }
                         ]
                     },
                     iphone: {
                         label: 'אייפון',
-                        icon: <Smartphone size={20} className="text-blue-400" />,
+                        icon: 'smartphone',
+                        color: 'text-blue-400',
                         issues: [
-                            { title: 'אין מקום בטלפון', steps: ['📸 מחקו תמונות וסרטונים כפולים.', '☁️ בדקו את מצב הגיבוי ב-iCloud.', '💬 מחקו סרטונים כבדים מהוואטסאפ.'] }
-                        ]
-                    }
-                }
-            },
-            peripherals: {
-                label: 'ציוד נוסף',
-                icon: <Printer size={24} />,
-                systems: {
-                    printer: {
-                        label: 'מדפסת',
-                        icon: <Printer size={20} className="text-orange-600" />,
-                        issues: [
-                            { title: 'לא מדפיסה', steps: ['🔌 בדקו שחיבור החשמל וה-USB מהודקים.', '📄 ודאו שיש דפים במגש.', '📶 ודאו שהמדפסת והמחשב על אותה רשת Wi-Fi.'] }
+                            { title: 'אין מקום בטלפון', steps: ['📸 מחקו תמונות כפולות.', '💬 מחקו סרטונים מהוואטסאפ.'] }
                         ]
                     }
                 }
             }
         };
 
-        const apiKey = ""; // Environment provides the key
+        const apiKey = ""; // API Key used by system
+
+        // Icon Component using Lucide
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const ref = useRef(null);
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={`inline-block ${className}`}></i>;
+        };
 
         function App() {
             const [view, setView] = useState('home'); 
@@ -100,46 +98,39 @@
             const [userInput, setUserInput] = useState("");
             const [isAiLoading, setIsAiLoading] = useState(false);
             const [aiResponse, setAiResponse] = useState("");
-            const [copyStatus, setCopyStatus] = useState(null);
+            const [copyStatus, setCopyStatus] = useState(false);
             const fileInputRef = useRef(null);
 
-            const copyToClipboard = (text, type) => {
+            const copyToClipboard = () => {
+                const url = window.location.href;
                 const textArea = document.createElement("textarea");
-                textArea.value = text;
+                textArea.value = url;
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                setCopyStatus(type);
-                setTimeout(() => setCopyStatus(null), 2000);
+                setCopyStatus(true);
+                setTimeout(() => setCopyStatus(false), 2000);
             };
 
-            const handleShareApp = () => {
-                const url = window.location.href;
-                if (navigator.share) {
-                    navigator.share({ title: 'GimlaTech Helper', url: url }).catch(() => copyToClipboard(url, 'app'));
-                } else {
-                    copyToClipboard(url, 'app');
-                }
-            };
-
-            const startAiAnalysis = async (text) => {
-                if (!text.trim()) return;
+            const askAi = async () => {
+                if (!userInput.trim()) return;
                 setIsAiLoading(true);
                 setView('ai');
+                
                 try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [{ parts: [{ text: text }] }],
-                            systemInstruction: { parts: [{ text: "You are GimlaTech Helper. Tech support for seniors in Hebrew. Simple numbered steps with emojis." }] }
+                            contents: [{ parts: [{ text: userInput }] }],
+                            systemInstruction: { parts: [{ text: "אתה GimlaTech Helper. עזור לאנשים מבוגרים בתקלות טכנולוגיות בעברית פשוטה. השתמש בנקודות קצרות ואימוג'ים." }] }
                         })
                     });
-                    const data = await res.json();
-                    setAiResponse(data.candidates?.[0]?.content?.parts?.[0]?.text || "נסו שנית.");
+                    const data = await response.json();
+                    setAiResponse(data.candidates?.[0]?.content?.parts?.[0]?.text || "לא הצלחתי למצוא פתרון כרגע.");
                 } catch (e) {
-                    setAiResponse("שגיאת חיבור.");
+                    setAiResponse("שגיאת חיבור. ודאו שיש לכם אינטרנט.");
                 } finally {
                     setIsAiLoading(false);
                 }
@@ -148,81 +139,111 @@
             const goBack = () => {
                 if (view === 'os') setView('home');
                 else if (view === 'issues') setView('os');
-                else if (view === 'solution') setView('issues');
-                else if (view === 'ai') setView('issues');
+                else if (view === 'solution' || view === 'ai') setView('issues');
             };
 
             return (
-                <div className="min-h-screen text-slate-900 pb-10 overflow-x-hidden">
-                    <header className="bg-indigo-900 text-white sticky top-0 z-40 shadow-md p-3">
-                        <div className="max-w-md mx-auto flex items-center justify-between">
-                            <div className="flex items-center gap-2" onClick={() => {setView('home'); setSelection({device:null, os:null});}}>
-                                <Cpu size={20} className="text-indigo-300" />
-                                <h1 className="font-bold text-lg cursor-pointer">GimlaTech</h1>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={handleShareApp} className="bg-white/10 p-2 rounded-lg flex items-center gap-1 text-xs font-bold transition-all">
-                                    {copyStatus === 'app' ? <Check size={14} className="text-green-400" /> : <Share2 size={14} />}
-                                    <span>{copyStatus === 'app' ? 'הועתק' : 'שתף'}</span>
+                <div className="min-h-screen flex flex-col max-w-md mx-auto bg-white shadow-2xl relative">
+                    <header className="bg-indigo-900 text-white p-4 sticky top-0 z-50 flex items-center justify-between shadow-lg">
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => {setView('home'); setSelection({device:null, os:null});}}>
+                            <Icon name="cpu" size={20} className="text-indigo-300" />
+                            <h1 className="font-bold text-lg">GimlaTech Helper</h1>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button onClick={copyToClipboard} className="bg-white/10 p-2 rounded-lg text-xs font-bold">
+                                {copyStatus ? "הועתק!" : <Icon name="share-2" size={18} />}
+                            </button>
+                            {view !== 'home' && (
+                                <button onClick={goBack} className="bg-white/10 p-2 rounded-lg">
+                                    <Icon name="chevron-left" size={20} />
                                 </button>
-                                {view !== 'home' && (
-                                    <button onClick={goBack} className="bg-white/10 p-2 rounded-lg">
-                                        <ChevronLeft size={20} />
-                                    </button>
-                                )}
-                            </div>
+                            )}
                         </div>
                     </header>
 
-                    <main className="max-w-md mx-auto p-4 space-y-4">
+                    <main className="flex-1 p-5 overflow-y-auto">
                         {view === 'home' && (
-                            <div className="space-y-4 animate-in">
-                                <h2 className="text-2xl font-bold text-center py-2">מה המכשיר הבעייתי?</h2>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {Object.entries(DATA_TREE).map(([key, val]) => (
-                                        <button key={key} onClick={() => {setSelection({...selection, device: key}); setView('os');}} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 active:scale-95 transition-all">
-                                            <div className="p-2 bg-indigo-50 text-indigo-700 rounded-lg">{val.icon}</div>
-                                            <span className="text-sm font-bold">{val.label}</span>
+                            <div className="space-y-6 animate-in">
+                                <div className="text-center py-4">
+                                    <h2 className="text-3xl font-bold text-slate-800 tracking-tight">שלום!</h2>
+                                    <p className="text-slate-500 font-medium">במה נוכל לעזור היום?</p>
+                                </div>
+                                <div className="grid grid-cols-1 gap-4">
+                                    {Object.entries(DATA).map(([key, val]) => (
+                                        <button 
+                                            key={key} 
+                                            onClick={() => {setSelection({...selection, device: key}); setView('os');}}
+                                            className="bg-white p-6 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center gap-5 active:scale-95 transition-all text-right"
+                                        >
+                                            <div className="p-4 bg-indigo-50 text-indigo-700 rounded-2xl">
+                                                <Icon name={val.icon} size={32} />
+                                            </div>
+                                            <span className="font-bold text-xl">{val.label}</span>
                                         </button>
                                     ))}
                                 </div>
-                                <div className="bg-indigo-800 rounded-3xl p-6 text-white shadow-xl text-center space-y-4">
-                                    <Camera size={40} className="mx-auto opacity-80" />
-                                    <p className="font-bold text-lg">יש לכם צילום מסך?</p>
-                                    <button onClick={() => fileInputRef.current.click()} className="w-full bg-white text-indigo-900 py-3 rounded-xl font-black text-sm">בחירת תמונה</button>
-                                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" />
+                                <div className="bg-indigo-800 rounded-3xl p-6 text-white shadow-xl flex items-center gap-4">
+                                    <Icon name="camera" size={40} className="opacity-50" />
+                                    <div className="text-right">
+                                        <p className="font-bold">יש לכם צילום מסך?</p>
+                                        <p className="text-xs opacity-80 mb-2">שלחו תמונה של התקלה וננתח אותה</p>
+                                        <button onClick={() => fileInputRef.current.click()} className="bg-white text-indigo-900 px-4 py-2 rounded-xl text-xs font-bold shadow-md">בחירת תמונה</button>
+                                        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" />
+                                    </div>
                                 </div>
                             </div>
                         )}
 
                         {view === 'os' && selection.device && (
-                            <div className="space-y-3 animate-in">
-                                <h2 className="text-lg font-bold">באיזו מערכת מדובר?</h2>
-                                {Object.entries(DATA_TREE[selection.device].systems).map(([key, val]) => (
-                                    <button key={key} onClick={() => {setSelection({...selection, os: key}); setView('issues');}} className="w-full bg-white p-4 rounded-xl border flex items-center justify-between shadow-sm">
-                                        <div className="flex items-center gap-3">{val.icon} <span className="font-bold text-lg">{val.label}</span></div>
-                                        <ChevronLeft size={20} className="text-slate-300" />
-                                    </button>
-                                ))}
+                            <div className="space-y-4 animate-in">
+                                <h2 className="text-xl font-bold px-1 text-slate-700 tracking-tight">איזו מערכת הפעלה יש לכם?</h2>
+                                <div className="space-y-3">
+                                    {Object.entries(DATA[selection.device].systems).map(([key, val]) => (
+                                        <button 
+                                            key={key} 
+                                            onClick={() => {setSelection({...selection, os: key}); setView('issues');}}
+                                            className="w-full bg-white p-5 rounded-3xl border-2 border-slate-100 flex items-center justify-between shadow-sm active:bg-slate-50 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <Icon name={val.icon} size={24} className={val.color} />
+                                                <span className="font-bold text-lg">{val.label}</span>
+                                            </div>
+                                            <Icon name="chevron-left" size={20} className="text-slate-300" />
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
                         {view === 'issues' && selection.os && (
                             <div className="space-y-6 animate-in">
-                                <div className="space-y-2">
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase">פתרונות נפוצים:</h3>
-                                    {DATA_TREE[selection.device].systems[selection.os].issues.map((issue, idx) => (
-                                        <button key={idx} onClick={() => {setActiveIssue(issue); setView('solution');}} className="w-full bg-white p-4 rounded-xl border text-right font-bold text-lg shadow-sm">
+                                <div className="space-y-3">
+                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">תקלות נפוצות:</h3>
+                                    {DATA[selection.device].systems[selection.os].issues.map((issue, idx) => (
+                                        <button 
+                                            key={idx} 
+                                            onClick={() => {setActiveIssue(issue); setView('solution');}}
+                                            className="w-full bg-white p-4 rounded-2xl border-2 border-slate-100 text-right font-bold shadow-sm active:bg-indigo-50"
+                                        >
                                             {issue.title}
                                         </button>
                                     ))}
                                 </div>
-                                <div className="bg-indigo-50 p-5 rounded-3xl border border-indigo-100 space-y-3">
-                                    <h3 className="font-bold text-indigo-800 flex items-center gap-2"><MessageSquare size={20} /> או תארו לנו מה קרה:</h3>
+                                <div className="bg-indigo-50 p-5 rounded-3xl border-2 border-indigo-100 space-y-3">
+                                    <p className="font-bold text-sm text-indigo-900">הבעיה לא מופיעה? תארו אותה כאן:</p>
                                     <div className="relative">
-                                        <textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="כתבו כאן..." className="w-full p-4 rounded-xl border border-indigo-200 min-h-[120px] text-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
-                                        <button onClick={() => startAiAnalysis(userInput)} disabled={!userInput.trim() || isAiLoading} className="absolute bottom-3 left-3 bg-indigo-600 text-white p-2.5 rounded-full shadow-lg">
-                                            {isAiLoading ? <RefreshCw size={24} className="animate-spin" /> : <Send size={24} />}
+                                        <textarea 
+                                            value={userInput}
+                                            onChange={(e) => setUserInput(e.target.value)}
+                                            placeholder="למשל: המחשב עושה רעש מוזר..."
+                                            className="w-full p-4 rounded-2xl border-2 border-indigo-200 min-h-[120px] text-lg focus:outline-none focus:border-indigo-500 transition-all shadow-inner"
+                                        />
+                                        <button 
+                                            onClick={askAi}
+                                            disabled={!userInput.trim() || isAiLoading}
+                                            className="absolute bottom-3 left-3 bg-indigo-600 text-white p-2.5 rounded-full shadow-lg disabled:bg-slate-300 active:scale-90"
+                                        >
+                                            {isAiLoading ? <Icon name="refresh-cw" size={24} className="animate-spin" /> : <Icon name="send" size={24} />}
                                         </button>
                                     </div>
                                 </div>
@@ -230,39 +251,53 @@
                         )}
 
                         {view === 'solution' && activeIssue && (
-                            <div className="space-y-5 animate-in">
-                                <div className="bg-white p-6 rounded-3xl border-t-8 border-green-500 shadow-xl">
-                                    <h2 className="text-2xl font-bold mb-6">{activeIssue.title}</h2>
-                                    <div className="space-y-4">
+                            <div className="space-y-6 animate-in">
+                                <div className="bg-white p-6 rounded-[2.5rem] border-t-[10px] border-green-500 shadow-2xl space-y-8">
+                                    <h2 className="text-2xl font-bold text-slate-800 leading-tight">{activeIssue.title}</h2>
+                                    <div className="space-y-5">
                                         {activeIssue.steps.map((step, i) => (
-                                            <div key={i} className="flex gap-4 items-start p-4 bg-green-50/50 rounded-2xl border border-green-100">
-                                                <span className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">{i + 1}</span>
-                                                <p className="font-bold text-slate-700 text-lg">{step}</p>
+                                            <div key={i} className="flex gap-4 items-start p-4 bg-green-50/30 rounded-2xl border border-green-100">
+                                                <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-md">
+                                                    {i + 1}
+                                                </div>
+                                                <p className="font-bold text-slate-700 text-lg leading-relaxed">{step}</p>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                                <button onClick={() => setView('issues')} className="w-full py-4 text-slate-500 font-bold underline text-lg">חזרה</button>
+                                <button onClick={() => setView('issues')} className="w-full py-4 text-slate-500 font-bold underline text-lg">חזרה לרשימה</button>
                             </div>
                         )}
 
                         {view === 'ai' && (
                             <div className="space-y-4 animate-in">
-                                <div className="bg-white p-6 rounded-3xl shadow-2xl border border-indigo-100">
-                                    <div className="flex items-center gap-2 mb-6 text-indigo-800 border-b pb-4"><HelpCircle size={28} /> <h2 className="text-xl font-black">הסבר GimlaTech:</h2></div>
-                                    {isAiLoading ? <div className="py-16 text-center"><RefreshCw size={48} className="animate-spin mx-auto text-indigo-600" /></div> : <div className="whitespace-pre-wrap text-lg leading-relaxed bg-indigo-50/50 p-6 rounded-2xl text-slate-800 font-medium shadow-inner">{aiResponse}</div>}
+                                <div className="bg-white p-6 rounded-[2rem] shadow-2xl border-2 border-indigo-100">
+                                    <div className="flex items-center gap-2 mb-6 text-indigo-900 border-b pb-4 font-black">
+                                        <Icon name="help-circle" size={24} />
+                                        <h2 className="text-xl">פתרון GimlaTech:</h2>
+                                    </div>
+                                    {isAiLoading ? (
+                                        <div className="py-20 text-center space-y-4">
+                                            <Icon name="refresh-cw" size={48} className="animate-spin text-indigo-600 mx-auto opacity-50" />
+                                            <p className="font-bold text-slate-400">מכין עבורך פתרון פשוט...</p>
+                                        </div>
+                                    ) : (
+                                        <div className="whitespace-pre-wrap text-lg leading-relaxed text-slate-800 font-bold bg-indigo-50/50 p-6 rounded-3xl shadow-inner">
+                                            {aiResponse}
+                                        </div>
+                                    )}
                                 </div>
                                 <button onClick={() => setView('issues')} className="w-full py-4 text-slate-400 font-bold text-lg">חזרה</button>
                             </div>
                         )}
                     </main>
 
-                    <div className="max-w-md mx-auto px-4 mt-6">
-                        <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 flex gap-3 text-sm text-amber-900 items-center justify-center shadow-sm italic">
-                            <AlertCircle size={20} className="text-amber-600" />
-                            <span>טיפ: כיבוי והדלקה מחדש פותרים כמעט כל בעיה!</span>
+                    <footer className="p-6 bg-slate-50 border-t">
+                        <div className="bg-amber-100 p-5 rounded-3xl border-2 border-amber-200 flex gap-4 text-sm text-amber-900 items-center justify-center italic text-center font-bold shadow-sm leading-relaxed">
+                            <Icon name="alert-circle" size={24} className="text-amber-600 flex-shrink-0" />
+                            <span>טיפ: כיבוי והדלקה מחדש של המכשיר פותרים 90% מהתקלות!</span>
                         </div>
-                    </div>
+                    </footer>
                 </div>
             );
         }
@@ -272,4 +307,3 @@
     </script>
 </body>
 </html>
-
