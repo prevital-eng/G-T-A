@@ -3,20 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GimlaTech Helper - פותר תקלות חכם</title>
-    
+    <title>GimlaTech Helper</title>
     <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
-        body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; }
-        .card-shadow { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .step-enter { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap');
+        body { font-family: 'Assistant', sans-serif; background-color: #e2e8f0; }
+        .app-container { max-width: 450px; min-height: 85vh; margin: 2rem auto; background: white; border-radius: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 8px solid #1e293b; position: relative; overflow: hidden; display: flex; flex-column: column; }
     </style>
 </head>
 <body>
@@ -25,125 +21,102 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        const Icon = ({ name, size = 24, className = "" }) => {
+        const Icon = ({ name, size = 28 }) => {
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
-            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+            return <i data-lucide={name} style={{ width: size, height: size }}></i>;
         };
 
         const App = () => {
-            const [view, setView] = useState('home'); // home, os, issues, wizard
-            const [selection, setSelection] = useState({ device: '', os: '', issue: '' });
-            const [currentStep, setCurrentStep] = useState(0);
+            const [step, setStep] = useState(1);
+            const [data, setData] = useState({ device: '', os: '', issue: '' });
 
-            // מאגר פתרונות צעד-אחר-צעד
-            const wifiWizard = [
-                { title: "בדיקת כפתור ה-Wi-Fi", desc: "ודאו שכפתור הטיסה לא דולק ושסימן ה-Wi-Fi כחול/דולק.", img: "📶" },
-                { title: "כיבוי והדלקה", desc: "כבו את ה-Wi-Fi במכשיר, המתינו 10 שניות והדליקו מחדש.", img: "🔄" },
-                { title: "בדיקת הנתב (ראוטר)", desc: "לכו למכשיר עם האורות המהבהבים. האם יש אור אדום? אם כן, הוציאו מהחשמל והחזירו.", img: "🔌" },
-                { title: "סיום ובדיקה", desc: "נסו לפתוח את אתר 'גוגל'. עובד? מצוין! לא עובד? כנראה שיש תקלה ספקית.", img: "✅" }
+            const devices = [
+                { id: 'pc', name: 'מחשב', icon: 'monitor', color: 'bg-blue-500' },
+                { id: 'phone', name: 'טלפון', icon: 'smartphone', color: 'bg-green-500' },
+                { id: 'extra', name: 'ציוד היקפי', icon: 'printer', color: 'bg-purple-500' }
             ];
 
-            const handleIssueClick = (issue) => {
-                if (issue.includes("אינטרנט")) {
-                    setView('wizard');
-                    setCurrentStep(0);
-                } else {
-                    alert("מתחבר לבינה מלאכותית למציאת פתרון עבור: " + issue);
-                }
+            const osOptions = {
+                pc: ['Windows (ווינדוס)', 'Mac (מחשב אפל)'],
+                phone: ['Android (סמסונג/שיאומי)', 'iPhone (אייפון)'],
+                extra: ['מדפסת', 'עכבר/מקלדת', 'רמקולים']
             };
 
+            const issues = ['האינטרנט לא עובד 🌐', 'המכשיר לא נדלק 🔌', 'המסך קפוא ❄️', 'משהו אחר (הקלדה)...'];
+
+            const selectDevice = (d) => { setData({...data, device: d}); setStep(2); };
+            const selectOS = (o) => { setData({...data, os: o}); setStep(3); };
+
             return (
-                <div className="max-w-md mx-auto min-h-screen flex flex-col p-4">
+                <div className="app-container flex flex-col">
                     {/* Header */}
-                    <header className="flex justify-between items-center py-4 mb-4 border-b">
-                        <h1 onClick={() => setView('home')} className="text-2xl font-black text-blue-600 cursor-pointer">GimlaTech</h1>
-                        <div className="flex gap-2">
-                             <button className="p-2 bg-gray-100 rounded-full"><Icon name="share-2" size={18}/></button>
-                        </div>
-                    </header>
+                    <div className="bg-slate-800 text-white p-4 flex justify-between items-center">
+                        <span className="font-bold text-lg">GimlaTech Helper</span>
+                        <button onClick={() => setStep(1)} className="text-xs bg-slate-700 px-2 py-1 rounded">התחל מחדש</button>
+                    </div>
 
-                    {view === 'home' && (
-                        <div className="step-enter space-y-4">
-                            <div className="bg-gradient-to-l from-blue-500 to-blue-600 p-6 rounded-3xl text-white shadow-lg">
-                                <h2 className="text-xl font-bold mb-2">שלום! מה הבעיה?</h2>
-                                <p className="opacity-90">אנחנו כאן כדי לעזור לך לתקן הכל בקלות.</p>
-                            </div>
-                            
-                            <button className="w-full flex items-center p-6 bg-white rounded-2xl shadow-sm border-2 border-transparent hover:border-blue-400 transition-all text-right"
-                                    onClick={() => {setSelection({...selection, device: 'מחשב'}); setView('os');}}>
-                                <div className="bg-orange-100 p-3 rounded-xl ml-4"><Icon name="monitor" className="text-orange-600"/></div>
-                                <div><h3 className="font-bold text-lg">תקלה במחשב</h3><p className="text-sm text-gray-500">נייח, נייד או טאבלט</p></div>
-                            </button>
-
-                            <button className="w-full flex items-center p-6 bg-white rounded-2xl shadow-sm border-2 border-transparent hover:border-blue-400 transition-all text-right"
-                                    onClick={() => {setSelection({...selection, device: 'טלפון'}); setView('os');}}>
-                                <div className="bg-blue-100 p-3 rounded-xl ml-4"><Icon name="smartphone" className="text-blue-600"/></div>
-                                <div><h3 className="font-bold text-lg">תקלה בטלפון</h3><p className="text-sm text-gray-500">אייפון או אנדרואיד</p></div>
-                            </button>
-                        </div>
-                    )}
-
-                    {view === 'os' && (
-                        <div className="step-enter space-y-4">
-                            <button onClick={() => setView('home')} className="text-blue-600 font-bold mb-2 flex items-center">← חזרה</button>
-                            <h2 className="text-2xl font-bold">איזה מכשיר זה?</h2>
-                            {['Android / Samsung', 'iPhone (Apple)', 'Windows PC', 'Macbook'].map(os => (
-                                <button key={os} onClick={() => setView('issues')} className="w-full p-5 bg-white rounded-xl shadow-sm text-right font-bold hover:bg-blue-50">
-                                    {os}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-
-                    {view === 'issues' && (
-                        <div className="step-enter space-y-4">
-                            <button onClick={() => setView('os')} className="text-blue-600 font-bold flex items-center">← חזרה</button>
-                            <h2 className="text-2xl font-bold">מה קרה?</h2>
-                            {['האינטרנט לא עובד 🌐', 'אין קול ברמקולים 🔊', 'המכשיר איטי מאוד 🐢', 'צריך להוריד אפליקציה ⬇️'].map(issue => (
-                                <button key={issue} onClick={() => handleIssueClick(issue)} className="w-full p-4 bg-white rounded-xl border-r-4 border-blue-500 shadow-sm text-right">
-                                    {issue}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-
-                    {view === 'wizard' && (
-                        <div className="step-enter flex flex-col items-center text-center space-y-6 pt-10">
-                            <div className="text-6xl mb-4">{wifiWizard[currentStep].img}</div>
-                            <h2 className="text-2xl font-bold text-blue-800">{wifiWizard[currentStep].title}</h2>
-                            <p className="text-xl leading-relaxed text-gray-700 bg-white p-6 rounded-2xl shadow-inner">
-                                {wifiWizard[currentStep].desc}
-                            </p>
-                            
-                            <div className="w-full flex gap-3 mt-8">
-                                {currentStep < wifiWizard.length - 1 ? (
-                                    <button 
-                                        onClick={() => setCurrentStep(currentStep + 1)}
-                                        className="flex-grow bg-blue-600 text-white py-5 rounded-2xl text-xl font-bold shadow-lg"
-                                    >
-                                        עשיתי, מה השלב הבא?
+                    <div className="p-6 flex-grow overflow-y-auto">
+                        
+                        {/* מסך 1: בחירת מכשיר */}
+                        {step === 1 && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h2 className="text-2xl font-bold text-slate-800">שלום!</h2>
+                                    <p className="text-slate-500">באיזה מכשיר יש תקלה?</p>
+                                </div>
+                                {devices.map(d => (
+                                    <button key={d.id} onClick={() => selectDevice(d.id)} 
+                                        className="w-full flex items-center p-6 bg-white border-2 border-slate-100 rounded-2xl shadow-sm hover:border-blue-500 transition-all">
+                                        <div className={`${d.color} p-3 rounded-full text-white ml-4`}><Icon name={d.icon}/></div>
+                                        <span className="text-xl font-bold">{d.name}</span>
                                     </button>
-                                ) : (
-                                    <button 
-                                        onClick={() => setView('home')}
-                                        className="flex-grow bg-green-600 text-white py-5 rounded-2xl text-xl font-bold shadow-lg"
-                                    >
-                                        זה הסתדר! תודה 😊
-                                    </button>
-                                )}
+                                ))}
+                                <button className="w-full mt-4 flex items-center justify-center gap-2 p-3 bg-slate-100 rounded-xl text-slate-600 font-bold">
+                                    <Icon name="camera" size={20}/> העלאת צילום מסך
+                                </button>
                             </div>
-                            {currentStep > 0 && (
-                                <button onClick={() => setCurrentStep(currentStep - 1)} className="text-gray-500 underline">חזור לשלב הקודם</button>
-                            )}
-                        </div>
-                    )}
+                        )}
 
-                    <footer className="mt-auto pt-10 text-center">
-                        <div className="bg-white p-4 rounded-xl border-2 border-blue-100 inline-block">
-                             <p className="text-sm font-bold">צריכים עזרה אנושית? 📞</p>
-                             <p className="text-blue-600 font-bold text-lg">050-XXXXXXX</p>
-                        </div>
-                    </footer>
+                        {/* מסך 2: מערכת הפעלה בהתאמה */}
+                        {step === 2 && (
+                            <div className="space-y-4">
+                                <button onClick={() => setStep(1)} className="text-blue-600 font-bold">← חזרה</button>
+                                <h2 className="text-xl font-bold mb-4">איזה סוג בדיוק?</h2>
+                                {osOptions[data.device].map(os => (
+                                    <button key={os} onClick={() => selectOS(os)}
+                                        className="w-full p-5 bg-white border-2 border-slate-100 rounded-xl text-right text-lg font-bold hover:bg-blue-50">
+                                        {os}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* מסך 3: בחירת תקלה */}
+                        {step === 3 && (
+                            <div className="space-y-4">
+                                <button onClick={() => setStep(2)} className="text-blue-600 font-bold">← חזרה</button>
+                                <h2 className="text-xl font-bold mb-4">מה הבעיה ב-{data.os}?</h2>
+                                {issues.map(issue => (
+                                    <button key={issue} onClick={() => alert('מפעיל סורק תקלות עבור ' + issue)}
+                                        className="w-full p-4 bg-white border-r-8 border-blue-500 rounded-lg shadow-sm text-right font-medium">
+                                        {issue}
+                                    </button>
+                                ))}
+                                <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                    <p className="text-sm font-bold text-blue-800 mb-2">עזרה מהירה מה-AI:</p>
+                                    <textarea className="w-full p-2 rounded border" placeholder="תאר את הבעיה כאן..."></textarea>
+                                    <button className="w-full bg-blue-600 text-white p-2 mt-2 rounded font-bold">שלח לבדיקה</button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer / Share */}
+                    <div className="p-4 bg-slate-50 border-t flex justify-center">
+                        <button onClick={() => alert('קישור הועתק!')} className="flex items-center gap-2 text-slate-500 font-bold border-2 border-slate-200 px-4 py-2 rounded-full hover:bg-white">
+                            <Icon name="share-2" size={18}/> שיתוף האפליקציה
+                        </button>
+                    </div>
                 </div>
             );
         };
