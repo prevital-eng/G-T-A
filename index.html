@@ -195,12 +195,17 @@ async function callGemini(userQuestion, imageBase64) {
     if (!res.ok) throw new Error(`שגיאת שרת ${res.status}`);
 
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
+
+    // שגיאה מה-Apps Script
+    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+
+    // שגיאה מ-Anthropic
+    if (data.type === 'error') throw new Error(data.error?.message || JSON.stringify(data.error));
 
     const rawText = (data.content || [])
         .filter(c => c.type === 'text').map(c => c.text).join('');
 
-    if (!rawText) throw new Error('לא התקבלה תשובה');
+    if (!rawText) throw new Error('לא התקבלה תשובה — בדוק שהמפתח תקין ב-Apps Script');
 
     const jsonMatch = rawText.replace(/```json/gi,'').replace(/```/g,'').trim().match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('תשובה בפורמט לא תקין');
