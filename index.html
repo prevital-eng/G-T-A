@@ -35,6 +35,7 @@
             background-color: var(--surface);
             border: 2px solid var(--border);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .card:hover {
@@ -69,26 +70,27 @@
             outline: none;
         }
 
-        /* Perfectly Centered Footer Button */
+        /* Fixed and Perfectly Centered Footer Button - Prevents blocking clicks */
         .footer-container {
             position: fixed;
             bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: auto;
-            min-width: 320px;
-            max-width: 90vw;
+            left: 0;
+            width: 100%;
             display: flex;
             justify-content: center;
+            padding: 0 20px;
             z-index: 100;
+            pointer-events: none; /* Crucial: Allows clicks to pass through to elements behind */
         }
 
         .whatsapp-btn {
             background-color: var(--green);
             color: white;
+            max-width: 500px;
             width: 100%;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
             transition: transform 0.2s ease, background-color 0.2s;
+            pointer-events: auto; /* Re-enable clicks for the button itself */
         }
 
         .whatsapp-btn:hover {
@@ -187,9 +189,9 @@
 
         <!-- Screen 2: OS Selection -->
         <div id="screen-os" class="screen">
-            <div class="flex items-center gap-2 text-sm text-gray-500 mb-4 cursor-pointer hover:text-sky-400" onclick="goScreen('device')">
+            <button class="flex items-center gap-2 text-sm text-gray-500 mb-4 hover:text-sky-400 transition-colors" onclick="goScreen('device')">
                 <span>🏠 חזרה לבחירת מכשיר</span>
-            </div>
+            </button>
             <h1 class="text-3xl font-extrabold mb-2 text-center" id="os-title">איזו מערכת הפעלה?</h1>
             <div class="flex items-center gap-2 mb-10 max-w-xs mx-auto">
                 <div class="step-dot done">✓</div>
@@ -204,9 +206,9 @@
         <!-- Screen 3: Search & Answers -->
         <div id="screen-search" class="screen">
             <div class="flex items-center gap-4 text-sm mb-6 flex-wrap">
-                <span onclick="goScreen('device')" class="text-gray-500 hover:text-white cursor-pointer">🏠 מכשיר: <b id="bread-device" class="text-sky-400"></b></span>
+                <button onclick="goScreen('device')" class="text-gray-500 hover:text-white transition-colors">🏠 מכשיר: <b id="bread-device" class="text-sky-400"></b></button>
                 <span class="text-gray-700">/</span>
-                <span onclick="goScreen('os')" class="text-gray-500 hover:text-white cursor-pointer">💻 מערכת: <b id="bread-os" class="text-sky-400"></b></span>
+                <button onclick="goScreen('os')" class="text-gray-500 hover:text-white transition-colors">💻 מערכת: <b id="bread-os" class="text-sky-400"></b></button>
             </div>
 
             <div class="relative mb-8">
@@ -228,7 +230,7 @@
 
     </main>
 
-    <!-- Footer Support Button - Perfectly Centered -->
+    <!-- Footer Support Button - Perfectly Centered and Accessible -->
     <div class="footer-container">
         <button onclick="openSupportWa()" class="whatsapp-btn flex items-center justify-center gap-3 py-4 px-8 rounded-2xl font-bold text-lg">
             <span>פנייה לסיירת גימלאטק — 0505396068</span>
@@ -256,28 +258,34 @@
 
         function goScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-' + id).classList.add('active');
+            const target = document.getElementById('screen-' + id);
+            if(target) target.classList.add('active');
             window.scrollTo(0, 0);
         }
 
         function selectDevice(id, label) {
             state.device = id;
             state.deviceLabel = label;
-            document.getElementById('bread-device').innerText = label;
+            const bread = document.getElementById('bread-device');
+            if(bread) bread.innerText = label;
+            
             const container = document.getElementById('os-options');
-            container.innerHTML = OS_OPTIONS[id].map(os => `
-                <button onclick="selectOS('${os.id}', '${os.label}')" class="card rounded-2xl p-8 flex flex-col items-center gap-4">
-                    <span class="text-5xl">${os.icon}</span>
-                    <span class="text-xl font-bold">${os.label}</span>
-                </button>
-            `).join('');
+            if(container) {
+                container.innerHTML = OS_OPTIONS[id].map(os => `
+                    <button onclick="selectOS('${os.id}', '${os.label}')" class="card rounded-2xl p-8 flex flex-col items-center gap-4 w-full">
+                        <span class="text-5xl">${os.icon}</span>
+                        <span class="text-xl font-bold">${os.label}</span>
+                    </button>
+                `).join('');
+            }
             goScreen('os');
         }
 
         function selectOS(id, label) {
             state.os = id;
             state.osLabel = label;
-            document.getElementById('bread-os').innerText = label;
+            const bread = document.getElementById('bread-os');
+            if(bread) bread.innerText = label;
             renderTags();
             searchKB('');
             goScreen('search');
@@ -285,6 +293,7 @@
 
         function renderTags() {
             const container = document.getElementById('tags-container');
+            if(!container) return;
             const relevantKB = KB.filter(item => item.dev.includes(state.os));
             const cats = [...new Set(relevantKB.map(k => k.cat))];
             container.innerHTML = cats.map(cat => `<button onclick="filterTag('${cat}')" class="tag px-4 py-2 rounded-full text-sm font-medium ${state.activeTag === cat ? 'active' : ''}">${cat}</button>`).join('');
@@ -305,6 +314,8 @@
         function searchKB(q) {
             const resultsArea = document.getElementById('results-area');
             const answerContainer = document.getElementById('answer-container');
+            if(!resultsArea || !answerContainer) return;
+            
             answerContainer.classList.add('hidden');
             const filtered = KB.filter(item => item.dev.includes(state.os) && 
                 (item.title.toLowerCase().includes(q.toLowerCase()) || item.cat.toLowerCase().includes(q.toLowerCase())) && 
@@ -312,7 +323,7 @@
             
             resultsArea.innerHTML = filtered.map(item => `
                 <div onclick='showAnswer(${JSON.stringify(item)})' class="card p-5 rounded-2xl cursor-pointer flex justify-between items-center group">
-                    <div>
+                    <div class="text-right">
                         <span class="text-xs text-sky-400 font-bold uppercase tracking-widest">${item.cat}</span>
                         <h3 class="text-lg font-bold mt-1">${item.title}</h3>
                     </div>
@@ -323,32 +334,39 @@
 
         function showAnswer(item, isAI = false) {
             state.currentAnswer = item;
-            document.getElementById('results-area').innerHTML = '';
+            const resultsArea = document.getElementById('results-area');
             const container = document.getElementById('answer-container');
-            container.classList.remove('hidden');
+            const content = document.getElementById('answer-content');
+            
+            if(resultsArea) resultsArea.innerHTML = '';
+            if(container) container.classList.remove('hidden');
             
             const badge = isAI ? 
                 `<span class="bg-indigo-500/20 text-indigo-400 text-xs font-bold px-2 py-1 rounded border border-indigo-500/20">🔍 חיפוש עמוק (AI)</span>` : 
                 `<span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">מענה מהמאגר</span>`;
 
-            document.getElementById('answer-content').innerHTML = `
-                <div class="flex items-center gap-2 mb-4">${badge}</div>
-                <h2 class="text-2xl font-black mb-6">${item.title}</h2>
-                <div class="space-y-4 mb-8">
-                    ${item.steps.map((step, i) => `
-                        <div class="flex gap-4 items-start">
-                            <span class="flex-shrink-0 w-8 h-8 bg-sky-500 text-black font-bold rounded-full flex items-center justify-center">${i + 1}</span>
-                            <p class="text-lg pt-1">${step}</p>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 mb-6"><p class="text-amber-400 text-sm">💡 <b>טיפ:</b> ${item.tip}</p></div>
-                
-                <button id="copy-btn" onclick="copyAnswer()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all">
-                    <span>📋 העתק תשובה (להדבקה בוואטסאפ)</span>
-                </button>
-            `;
-            container.scrollIntoView({ behavior: 'smooth' });
+            if(content) {
+                content.innerHTML = `
+                    <div class="flex items-center gap-2 mb-4">${badge}</div>
+                    <h2 class="text-2xl font-black mb-6 text-right">${item.title}</h2>
+                    <div class="space-y-4 mb-8 text-right">
+                        ${item.steps.map((step, i) => `
+                            <div class="flex gap-4 items-start flex-row-reverse">
+                                <span class="flex-shrink-0 w-8 h-8 bg-sky-500 text-black font-bold rounded-full flex items-center justify-center">${i + 1}</span>
+                                <p class="text-lg pt-1">${step}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 mb-6 text-right">
+                        <p class="text-amber-400 text-sm">💡 <b>טיפ:</b> ${item.tip}</p>
+                    </div>
+                    
+                    <button id="copy-btn" onclick="copyAnswer()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all">
+                        <span>📋 העתק תשובה (להדבקה בוואטסאפ)</span>
+                    </button>
+                `;
+            }
+            if(container) container.scrollIntoView({ behavior: 'smooth' });
         }
 
         async function fetchWithRetry(url, options, retries = 5) {
@@ -371,15 +389,18 @@
             if (!query) return;
 
             const answerContainer = document.getElementById('answer-container');
-            answerContainer.classList.remove('hidden');
-            document.getElementById('answer-content').innerHTML = `
-                <div class="flex flex-col items-center py-10 gap-4">
-                    <div class="spinner"></div>
-                    <p class="text-indigo-300 font-bold">ה-AI מנתח ומכין פתרון ממאגרי התמיכה...</p>
-                </div>
-            `;
+            const answerContent = document.getElementById('answer-content');
+            
+            if(answerContainer) answerContainer.classList.remove('hidden');
+            if(answerContent) {
+                answerContent.innerHTML = `
+                    <div class="flex flex-col items-center py-10 gap-4">
+                        <div class="spinner"></div>
+                        <p class="text-indigo-300 font-bold">ה-AI מנתח ומכין פתרון ממאגרי התמיכה...</p>
+                    </div>
+                `;
+            }
 
-            // המודל המוגדר בהנחיות המערכת
             const modelName = "gemini-2.5-flash-preview-09-2025";
             const systemPrompt = `אתה מומחה תמיכה טכנית בכיר עבור "גימלאטק". תפקידך לספק פתרונות פשוטים למבוגרים. החזר JSON בלבד במבנה: { "title": "כותרת", "steps": ["צעד 1", "צעד 2"], "tip": "טיפ" }. המכשיר: ${state.deviceLabel} (${state.osLabel}).`;
 
@@ -408,23 +429,27 @@
                     body: JSON.stringify(payload) 
                 });
                 
-                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                let text = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (!text) throw new Error("Empty response");
                 
-                // ניקוי טקסט שאולי השתרבב לפני/אחרי ה-JSON
-                const jsonStart = text.indexOf('{');
-                const jsonEnd = text.lastIndexOf('}') + 1;
-                const cleanJson = text.substring(jsonStart, jsonEnd);
+                // Cleanup potentially messy AI output
+                const start = text.indexOf('{');
+                const end = text.lastIndexOf('}') + 1;
+                if (start !== -1 && end !== -1) {
+                    text = text.substring(start, end);
+                }
                 
-                showAnswer(JSON.parse(cleanJson), true);
+                showAnswer(JSON.parse(text), true);
             } catch (err) {
-                document.getElementById('answer-content').innerHTML = `
-                    <div class="text-center py-8">
-                        <p class="text-red-400 font-bold mb-2">שגיאה בתקשורת עם ה-AI</p>
-                        <p class="text-sm text-gray-400">המערכת לא הצליחה לקבל תשובה תקינה. נסה לנסח את השאלה אחרת (לדוגמה: "איך שולחים הודעה") או לבדוק שוב בעוד דקה.</p>
-                        <button onclick="triggerAI()" class="mt-4 text-sky-400 underline font-bold">נסה שוב</button>
-                    </div>
-                `;
+                if(answerContent) {
+                    answerContent.innerHTML = `
+                        <div class="text-center py-8">
+                            <p class="text-red-400 font-bold mb-2">שגיאה בתקשורת עם ה-AI</p>
+                            <p class="text-sm text-gray-400">המערכת לא הצליחה לקבל תשובה תקינה. נסה לנסח את השאלה אחרת (לדוגמה: "איך שולחים הודעה") או לבדוק שוב בעוד דקה.</p>
+                            <button onclick="triggerAI()" class="mt-4 text-sky-400 underline font-bold">נסה שוב</button>
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -441,13 +466,15 @@
             document.body.removeChild(dummy);
 
             const btn = document.getElementById('copy-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "✅ הועתק ללוח!";
-            btn.classList.replace('bg-indigo-600', 'bg-green-600');
-            setTimeout(() => { 
-                btn.innerHTML = originalText; 
-                btn.classList.replace('bg-green-600', 'bg-indigo-600');
-            }, 2000);
+            if(btn) {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = "✅ הועתק ללוח!";
+                btn.classList.replace('bg-indigo-600', 'bg-green-600');
+                setTimeout(() => { 
+                    btn.innerHTML = originalText; 
+                    btn.classList.replace('bg-green-600', 'bg-indigo-600');
+                }, 2000);
+            }
         }
 
         function openSupportWa() {
