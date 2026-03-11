@@ -4,825 +4,727 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GimlaTech AI Helper</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface2: #273549;
-  --accent: #38bdf8;
-  --accent2: #818cf8;
-  --success: #34d399;
-  --text: #f1f5f9;
-  --muted: #94a3b8;
-  --border: #334155;
-  --wa: #25d366;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #263348;
+    --border: #334155;
+    --accent: #38bdf8;
+    --purple: #818cf8;
+    --green: #34d399;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --danger: #f87171;
+    --warn: #fbbf24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); direction: rtl; }
 
-/* ══ DESKTOP: תצוגה דו-עמודית ══ */
-.page-wrap {
-  display: flex; min-height: 100vh;
-}
-/* עמודה שמאל — לוגו + תיאור, רק בדסקטופ */
-.sidebar {
-  display: none;
-}
-.app {
-  width: 100%; max-width: 520px; min-height: 100vh;
-  display: flex; flex-direction: column; position: relative;
-  margin: 0 auto;
-}
-
-@media (min-width: 900px) {
-  body { background: #070f1d; }
-  .page-wrap { align-items: stretch; justify-content: center; gap: 0; }
-
+  /* Layout */
+  .app-wrapper { display: flex; min-height: 100vh; }
   .sidebar {
-    display: flex; flex-direction: column; justify-content: center;
-    width: 340px; flex-shrink: 0;
-    padding: 48px 40px;
-    background: linear-gradient(160deg, #0f1e35 0%, #0a1628 100%);
-    border-left: 1px solid #1e3a5f;
+    display: none;
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 40px 28px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-direction: column;
   }
-  .sidebar-logo { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
-  .sidebar-logo span { color: var(--accent); }
-  .sidebar-tag {
-    display: inline-block; background: rgba(56,189,248,0.12);
-    border: 1px solid rgba(56,189,248,0.3); color: var(--accent);
-    font-size: 11px; font-weight: 700; padding: 4px 12px;
-    border-radius: 20px; margin-bottom: 28px;
+  @media (min-width: 900px) { .sidebar { display: flex; } }
+  .sidebar-logo { font-size: 2rem; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+  .sidebar-logo span.blue { color: var(--accent); }
+  .sidebar-logo span.purple { color: var(--purple); }
+  .sidebar-tagline { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 24px 0; }
+  .sidebar-info { font-size: 0.82rem; color: var(--text-dim); line-height: 1.8; }
+  .sidebar-info .feature { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .sidebar-info .feature span.icon { font-size: 1rem; }
+  .sidebar-footer { margin-top: auto; font-size: 0.75rem; color: var(--text-dim); line-height: 1.7; }
+  .sidebar-badge { display: inline-block; background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); border-radius: 20px; padding: 2px 10px; font-size: 0.7rem; font-weight: 700; margin-bottom: 16px; }
+
+  .main-content { flex: 1; display: flex; flex-direction: column; min-height: 100vh; overflow: hidden; }
+
+  /* Screens */
+  .screen { display: none; flex-direction: column; min-height: 100vh; padding: 28px 20px 100px; animation: fadeUp 0.4s ease both; }
+  .screen.active { display: flex; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Header */
+  .screen-header { margin-bottom: 28px; }
+  .screen-header .mobile-logo { font-size: 1.5rem; font-weight: 900; margin-bottom: 4px; }
+  .screen-header .mobile-logo span.blue { color: var(--accent); }
+  .screen-header .mobile-logo span.purple { color: var(--purple); }
+  @media (min-width: 900px) { .screen-header .mobile-logo { display: none; } }
+  .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-dim); margin-bottom: 14px; flex-wrap: wrap; }
+  .breadcrumb span { cursor: pointer; transition: color 0.2s; }
+  .breadcrumb span:hover { color: var(--accent); }
+  .breadcrumb .sep { color: var(--border); }
+  .breadcrumb .current { color: var(--text-muted); }
+  .screen-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+  .screen-subtitle { font-size: 0.88rem; color: var(--text-muted); }
+
+  /* Step indicator */
+  .steps-row { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; border: 2px solid var(--border); background: var(--surface); color: var(--text-dim); transition: all 0.3s; }
+  .step-dot.done { background: var(--accent); border-color: var(--accent); color: #0f172a; }
+  .step-dot.active { border-color: var(--accent); color: var(--accent); }
+  .step-line { flex: 1; height: 2px; background: var(--border); border-radius: 2px; transition: background 0.3s; }
+  .step-line.done { background: var(--accent); }
+
+  /* Device/OS cards */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+  @media (min-width: 900px) { .cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
+  .card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
   }
-  .sidebar-desc { font-size: 15px; color: #94a3b8; line-height: 1.8; margin-bottom: 32px; }
-  .sidebar-steps { display: flex; flex-direction: column; gap: 14px; }
-  .sidebar-step { display: flex; align-items: center; gap: 12px; }
-  .sidebar-step-num {
-    width: 28px; height: 28px; border-radius: 50%;
-    background: rgba(56,189,248,0.15); border: 1.5px solid rgba(56,189,248,0.4);
-    color: var(--accent); font-size: 12px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  .card:hover { border-color: var(--accent); background: rgba(56,189,248,0.06); transform: translateY(-2px); }
+  .card.selected { border-color: var(--accent); background: rgba(56,189,248,0.1); }
+  .card-icon { font-size: 2.4rem; line-height: 1; }
+  .card-label { font-size: 0.9rem; font-weight: 700; }
+  .card-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+  /* Search screen */
+  .search-box { position: relative; margin-bottom: 16px; }
+  .search-input {
+    width: 100%; background: var(--surface); border: 2px solid var(--border);
+    border-radius: 14px; padding: 14px 18px 14px 52px; font-size: 1rem;
+    color: var(--text); font-family: 'Heebo', sans-serif; outline: none; transition: border-color 0.2s;
+    direction: rtl;
   }
-  .sidebar-step-text { font-size: 13px; color: #64748b; }
-
-  .app {
-    max-width: 480px; flex-shrink: 0;
-    border-right: 1px solid #1e293b;
-    border-left: 1px solid #1e293b;
-    background: var(--bg);
+  .search-input::placeholder { color: var(--text-dim); }
+  .search-input:focus { border-color: var(--accent); }
+  .search-btn {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    background: var(--accent); border: none; border-radius: 8px; width: 34px; height: 34px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: background 0.2s;
   }
-  .wa-bar { left: auto; transform: none; right: auto; position: sticky; }
-  .modal-box { border-radius: 16px; margin-bottom: 40px; }
-  .modal-overlay { align-items: center; }
-}
+  .search-btn:hover { background: #7dd3fc; }
 
-/* ══ HEADER ══ */
-.header {
-  padding: 20px 20px 16px;
-  background: linear-gradient(180deg, #0f172a 0%, transparent 100%);
-  position: sticky; top: 0; z-index: 10;
-  backdrop-filter: blur(12px);
-}
-.logo-row { display: flex; align-items: center; gap: 10px; }
-.logo-icon { font-size: 26px; }
-.logo-text { font-size: 19px; font-weight: 900; letter-spacing: -0.5px; }
-.logo-text span { color: var(--accent); }
-.breadcrumb { display: flex; align-items: center; gap: 6px; margin-top: 10px; min-height: 22px; }
-.crumb { font-size: 12px; color: var(--muted); }
-.crumb.active { color: var(--accent); font-weight: 700; }
-.crumb-sep { color: var(--border); font-size: 12px; }
+  /* Tags */
+  .tags-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .tag {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 5px 13px; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; color: var(--text-muted);
+    font-family: 'Heebo', sans-serif; white-space: nowrap;
+  }
+  .tag:hover { border-color: var(--accent); color: var(--accent); }
+  .tag.active { background: rgba(56,189,248,0.12); border-color: var(--accent); color: var(--accent); }
 
-/* ══ BODY ══ */
-.body { flex: 1; padding: 4px 18px 90px; overflow-y: auto; }
-.screen { display: none; animation: fadeUp 0.25s ease; }
-.screen.active { display: block; }
-@keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+  /* Results */
+  .results-list { display: flex; flex-direction: column; gap: 12px; }
+  .result-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; cursor: pointer; transition: all 0.2s;
+  }
+  .result-card:hover { border-color: var(--accent); background: var(--surface2); }
+  .result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .result-cat { font-size: 1rem; }
+  .result-title { font-size: 0.95rem; font-weight: 700; flex: 1; }
+  .result-arrow { color: var(--text-dim); font-size: 0.9rem; }
+  .result-preview { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
 
-/* ══ SCREEN 1 — בחירת מכשיר ══ */
-.screen-title { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
-.screen-sub { font-size: 14px; color: var(--muted); margin-bottom: 22px; }
-.device-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-.device-card {
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: 18px;
-  padding: 18px 10px;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.18s;
-}
-.device-card:hover, .device-card.sel {
-  border-color: var(--accent);
-  background: var(--surface2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(56,189,248,0.15);
-}
-.device-card .icon { font-size: 32px; margin-bottom: 8px; display: block; }
-.device-card .label { font-size: 13px; font-weight: 700; color: var(--text); }
+  /* Answer panel */
+  .answer-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 20px; margin-top: 16px; }
+  .answer-source-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; border-radius: 20px; padding: 3px 10px; margin-bottom: 14px; }
+  .answer-source-badge.local { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+  .answer-source-badge.ai { background: rgba(129,140,248,0.12); color: var(--purple); border: 1px solid rgba(129,140,248,0.3); }
+  .answer-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 14px; line-height: 1.4; }
+  .answer-steps { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .answer-steps li { display: flex; gap: 12px; align-items: flex-start; }
+  .step-num { background: var(--accent); color: #0f172a; border-radius: 50%; width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; margin-top: 1px; }
+  .step-text { font-size: 0.88rem; line-height: 1.6; color: var(--text); flex: 1; }
+  .answer-tip { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); border-radius: 10px; padding: 12px 14px; font-size: 0.83rem; color: var(--warn); line-height: 1.6; }
+  .answer-tip strong { font-weight: 700; }
 
-/* ══ SCREEN 2 — מערכת הפעלה ══ */
-.os-list { display: flex; flex-direction: column; gap: 9px; }
-.os-btn {
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: 14px;
-  padding: 15px 18px;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 14px;
-  transition: all 0.15s; color: var(--text); width: 100%;
-  text-align: right;
-}
-.os-btn:hover, .os-btn.sel {
-  border-color: var(--accent2);
-  background: var(--surface2);
-  box-shadow: 0 4px 16px rgba(129,140,248,0.12);
-}
-.os-btn .os-icon { font-size: 24px; flex-shrink: 0; }
-.os-btn .os-label { font-size: 15px; font-weight: 700; }
-.os-btn .os-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  /* AI button */
+  .ai-btn {
+    width: 100%; background: linear-gradient(135deg, rgba(129,140,248,0.15), rgba(56,189,248,0.15));
+    border: 1px solid var(--purple); border-radius: 12px; padding: 13px 20px;
+    color: var(--purple); font-family: 'Heebo', sans-serif; font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px;
+  }
+  .ai-btn:hover { background: linear-gradient(135deg, rgba(129,140,248,0.25), rgba(56,189,248,0.25)); }
+  .ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ══ SCREEN 3 — חיפוש ══ */
-.search-box {
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: 16px;
-  display: flex; align-items: center; gap: 10px;
-  padding: 4px 14px 4px 8px;
-  margin-bottom: 14px;
-  transition: border-color 0.2s;
-}
-.search-box:focus-within { border-color: var(--accent); }
-.search-box input {
-  flex: 1; background: none; border: none; outline: none;
-  font-size: 16px; font-family: 'Heebo', sans-serif;
-  color: var(--text); padding: 12px 0;
-  direction: rtl;
-}
-.search-box input::placeholder { color: var(--muted); }
-.search-go {
-  background: var(--accent);
-  border: none; border-radius: 10px;
-  width: 38px; height: 38px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 18px; flex-shrink: 0;
-  transition: background 0.15s;
-}
-.search-go:hover { background: #7dd3fc; }
-.search-go:disabled { background: var(--border); cursor: default; }
+  /* Loading spinner */
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(129,140,248,0.3); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-/* תגי מסנן נושאים */
-.topics-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
-.topic-chip {
-  padding: 5px 13px; border-radius: 20px;
-  border: 1.5px solid var(--border);
-  background: var(--surface); color: var(--muted);
-  font-size: 12px; font-weight: 700; cursor: pointer;
-  transition: all 0.15s; white-space: nowrap;
-}
-.topic-chip:hover { border-color: var(--accent2); color: var(--accent2); }
-.topic-chip.active { background: var(--accent2); border-color: var(--accent2); color: white; }
+  /* Empty state */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 0.88rem; line-height: 1.7; }
 
-/* תוצאות מאגר */
-.results-label { font-size: 12px; color: var(--muted); margin-bottom: 10px; font-weight: 700; }
-.result-card {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 14px; padding: 14px 16px;
-  margin-bottom: 8px; cursor: pointer;
-  transition: all 0.15s; text-align: right;
-}
-.result-card:hover { border-color: var(--accent2); background: var(--surface2); }
-.result-card .r-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
-.result-card .r-meta { font-size: 12px; color: var(--muted); }
-.result-card mark { background: rgba(56,189,248,0.25); color: var(--accent); border-radius: 3px; padding: 0 2px; font-style: normal; }
+  /* Context badge */
+  .context-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .ctx-tag { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); border-radius: 20px; padding: 3px 10px; font-size: 0.73rem; color: var(--accent); }
 
-/* AI תשובה */
-.ai-box {
-  background: linear-gradient(135deg, #0c2340 0%, #1a1040 100%);
-  border: 1.5px solid rgba(129,140,248,0.4);
-  border-radius: 16px; padding: 18px;
-  margin-bottom: 14px; position: relative; overflow: hidden;
-}
-.ai-box::before {
-  content: '';
-  position: absolute; top: 0; right: 0;
-  width: 120px; height: 120px;
-  background: radial-gradient(circle, rgba(129,140,248,0.15) 0%, transparent 70%);
-  pointer-events: none;
-}
-.ai-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
-.ai-badge { background: var(--accent2); color: white; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
-.ai-typing { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
-.dots span { display: inline-block; width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; animation: bounce 1.2s infinite; margin: 0 2px; }
-.dots span:nth-child(2) { animation-delay: 0.2s; }
-.dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
-.ai-content { font-size: 14px; line-height: 1.8; color: #cbd5e1; white-space: pre-wrap; }
-.ai-content strong { color: var(--text); }
-.ai-step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
-.ai-step-num { background: var(--accent2); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-.ai-step-text { font-size: 14px; color: #cbd5e1; line-height: 1.6; }
-.ai-tip { background: rgba(251,191,36,0.1); border-right: 3px solid #fbbf24; padding: 10px 12px; border-radius: 8px; font-size: 13px; color: #fde68a; margin-top: 12px; }
-.ai-error { color: #fca5a5; font-size: 14px; }
+  /* WhatsApp floating */
+  .wa-float {
+    position: fixed; bottom: 20px; left: 20px; z-index: 100;
+    background: #25D366; border-radius: 50px; padding: 12px 20px;
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.4); transition: all 0.2s; text-decoration: none;
+    font-family: 'Heebo', sans-serif; font-size: 0.82rem; font-weight: 700; color: white;
+    border: none;
+  }
+  .wa-float:hover { transform: translateY(-2px); box-shadow: 0 6px 26px rgba(37,211,102,0.5); }
 
-/* כפתורים */
-.btn-back {
-  background: none; border: none; color: var(--accent);
-  font-size: 13px; font-weight: 700; cursor: pointer;
-  padding: 0; margin-bottom: 18px;
-  font-family: 'Heebo', sans-serif;
-  display: flex; align-items: center; gap: 4px;
-}
-.btn-back:hover { color: #7dd3fc; }
-.btn-reset {
-  width: 100%; padding: 13px; border-radius: 14px;
-  background: var(--surface); border: 1.5px solid var(--border);
-  color: var(--muted); font-size: 14px; font-weight: 700;
-  cursor: pointer; font-family: 'Heebo', sans-serif;
-  transition: all 0.15s; margin-top: 8px;
-}
-.btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; max-width: 420px; width: 100%; animation: fadeUp 0.3s ease both; }
+  .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; }
+  .modal-sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal-input { width: 100%; background: var(--bg); border: 2px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 1rem; color: var(--text); font-family: 'Heebo', sans-serif; outline: none; margin-bottom: 16px; direction: ltr; text-align: left; }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-btns { display: flex; gap: 10px; }
+  .btn-primary { flex: 1; background: #25D366; border: none; border-radius: 10px; padding: 12px; color: white; font-family: 'Heebo', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .btn-primary:hover { background: #1fb95a; }
+  .btn-secondary { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text-muted); font-family: 'Heebo', sans-serif; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+  .btn-secondary:hover { background: var(--border); }
 
-/* WhatsApp */
-.wa-bar {
-  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 100%; max-width: 480px;
-  background: rgba(15,23,42,0.95); backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border); padding: 10px 18px; z-index: 20;
-}
-.wa-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--wa); color: white; text-decoration: none;
-  padding: 12px; border-radius: 14px; font-weight: 700; font-size: 15px;
-  font-family: 'Heebo', sans-serif; transition: background 0.15s;
-}
-.wa-btn:hover { background: #20b858; }
+  /* Share btn in answer */
+  .share-btn {
+    display: flex; align-items: center; gap: 8px; background: rgba(37,211,102,0.1);
+    border: 1px solid rgba(37,211,102,0.3); border-radius: 10px; padding: 10px 16px;
+    color: #25D366; font-family: 'Heebo', sans-serif; font-size: 0.83rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; margin-top: 14px; width: 100%; justify-content: center;
+  }
+  .share-btn:hover { background: rgba(37,211,102,0.18); }
 
-/* Answer page */
-.answer-steps { margin-bottom: 12px; }
-.answer-tip { background: rgba(251,191,36,0.1); border-right: 3px solid #fbbf24; padding: 10px 12px; border-radius: 8px; font-size: 13px; color: #fde68a; margin-top: 4px; }
-.db-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.4); color: var(--success); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+  /* No results AI prompt */
+  .no-results-ai { background: rgba(129,140,248,0.06); border: 1px dashed rgba(129,140,248,0.3); border-radius: 12px; padding: 20px; text-align: center; margin-top: 12px; }
+  .no-results-ai p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.6; }
 
-.hidden { display: none !important; }
-
-/* ══ מודל הזנת מספר ══ */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  display: flex; align-items: flex-end; justify-content: center;
-  z-index: 100; backdrop-filter: blur(4px);
-}
-.modal-box {
-  background: var(--surface); border-radius: 20px 20px 0 0;
-  padding: 24px 20px 32px; width: 100%; max-width: 480px;
-  border-top: 1px solid var(--border);
-}
-.modal-title { font-size: 17px; font-weight: 900; margin-bottom: 6px; }
-.modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
-.modal-input {
-  width: 100%; padding: 13px 16px; border-radius: 12px;
-  border: 2px solid var(--border); background: var(--bg);
-  color: var(--text); font-size: 18px; font-family: 'Heebo', sans-serif;
-  outline: none; letter-spacing: 1px; text-align: center;
-  margin-bottom: 8px;
-}
-.modal-input:focus { border-color: var(--wa); }
-.modal-error { color: #fca5a5; font-size: 12px; text-align: center; min-height: 18px; margin-bottom: 10px; }
-.modal-send {
-  width: 100%; padding: 14px; border-radius: 14px;
-  background: var(--wa); border: none; color: white;
-  font-size: 16px; font-weight: 700; cursor: pointer;
-  font-family: 'Heebo', sans-serif; margin-bottom: 10px;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.modal-send:hover { background: #20b858; }
-.modal-cancel {
-  width: 100%; padding: 11px; border-radius: 12px;
-  background: none; border: 1.5px solid var(--border);
-  color: var(--muted); font-size: 14px; cursor: pointer;
-  font-family: 'Heebo', sans-serif;
-}
-.modal-cancel:hover { border-color: var(--accent); color: var(--accent); }
-.share-row { display: flex; gap: 8px; margin-top: 14px; }
-.wa-share-btn {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
-  background: #1a3a28; border: 1.5px solid var(--wa);
-  color: var(--wa); border-radius: 12px; padding: 11px 10px;
-  font-size: 13px; font-weight: 700; cursor: pointer;
-  font-family: 'Heebo', sans-serif; transition: all 0.15s;
-  text-decoration: none;
-}
-.wa-share-btn:hover { background: #22543a; }
-.wa-share-btn.personal { background: #1e293b; border-color: var(--accent2); color: var(--accent2); }
-.wa-share-btn.personal:hover { background: var(--surface2); }
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
 <body>
-<div class="page-wrap">
 
-<!-- סיידבר — מוצג רק בדסקטופ -->
-<div class="sidebar">
-  <div class="sidebar-logo">Gimla<span>Tech</span></div>
-  <div class="sidebar-tag">🛠️ כלי עזר למתנדבים</div>
-  <div class="sidebar-desc">פתרון בעיות טכנולוגיות מהיר ומדויק — בעזרת בינה מלאכותית ומאגר ידע מקצועי.</div>
-  <div class="sidebar-steps">
-    <div class="sidebar-step"><div class="sidebar-step-num">1</div><div class="sidebar-step-text">בחרו סוג המכשיר</div></div>
-    <div class="sidebar-step"><div class="sidebar-step-num">2</div><div class="sidebar-step-text">בחרו מערכת הפעלה</div></div>
-    <div class="sidebar-step"><div class="sidebar-step-num">3</div><div class="sidebar-step-text">תארו את הבעיה — קבלו פתרון</div></div>
+<div class="app-wrapper">
+  <!-- Sidebar (desktop) -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-badge">🤖 AI Powered</div>
+      <div class="sidebar-logo"><span class="blue">Gimla</span><span class="purple">Tech</span></div>
+      <div style="font-size:0.95rem;font-weight:700;color:var(--text-muted);margin-bottom:10px;">AI Helper</div>
+      <div class="sidebar-tagline">כלי עזר טכני חכם למתנדבי גימלאטק — פתרונות מהירים לסיוע למבוגרים עם טכנולוגיה</div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-info">
+      <div class="feature"><span class="icon">🗂️</span> מאגר 80+ פתרונות מוכנים</div>
+      <div class="feature"><span class="icon">🤖</span> Claude AI לשאלות חופשיות</div>
+      <div class="feature"><span class="icon">📱</span> תמיכה בכל המכשירים</div>
+      <div class="feature"><span class="icon">💬</span> שיתוף מיידי בוואטסאפ</div>
+      <div class="feature"><span class="icon">🔍</span> חיפוש חכם בזמן אמת</div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-footer">
+      <div>פותח עבור מתנדבי גימלאטק</div>
+      <div>המסייעים למבוגרים בטכנולוגיה</div>
+      <div style="margin-top:8px;color:var(--accent);">גימלאטק — חיבור דורות 💙</div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+
+    <!-- Screen 1: Device Selection -->
+    <div class="screen active" id="screen-device">
+      <div class="screen-header">
+        <div class="mobile-logo"><span class="blue">Gimla</span><span class="purple">Tech</span> AI Helper</div>
+        <div class="screen-title">עם איזה מכשיר צריכים עזרה?</div>
+        <div class="screen-subtitle">בחר את סוג המכשיר של המבוגר</div>
+      </div>
+      <div class="steps-row">
+        <div class="step-dot active" id="sdot1">1</div>
+        <div class="step-line" id="sline1"></div>
+        <div class="step-dot" id="sdot2">2</div>
+        <div class="step-line" id="sline2"></div>
+        <div class="step-dot" id="sdot3">3</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card" onclick="selectDevice('computer','מחשב')">
+          <div class="card-icon">🖥️</div>
+          <div class="card-label">מחשב</div>
+          <div class="card-sub">Desktop / Laptop</div>
+        </div>
+        <div class="card" onclick="selectDevice('phone','טלפון חכם')">
+          <div class="card-icon">📱</div>
+          <div class="card-label">טלפון חכם</div>
+          <div class="card-sub">Smartphone</div>
+        </div>
+        <div class="card" onclick="selectDevice('peripheral','ציוד היקפי')">
+          <div class="card-icon">🖨️</div>
+          <div class="card-label">ציוד היקפי</div>
+          <div class="card-sub">מדפסת, עכבר, WiFi...</div>
+        </div>
+        <div class="card" onclick="selectDevice('tablet','טאבלט')">
+          <div class="card-icon">🖱️</div>
+          <div class="card-label">טאבלט</div>
+          <div class="card-sub">iPad / Android Tab</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 2: OS Selection -->
+    <div class="screen" id="screen-os">
+      <div class="screen-header">
+        <div class="mobile-logo"><span class="blue">Gimla</span><span class="purple">Tech</span> AI Helper</div>
+        <div class="breadcrumb">
+          <span onclick="goScreen('device')">🏠 מכשיר</span>
+          <span class="sep">‹</span>
+          <span class="current" id="bc-device">—</span>
+        </div>
+        <div class="screen-title">איזו מערכת הפעלה?</div>
+        <div class="screen-subtitle">בחר את מערכת ההפעלה של המכשיר</div>
+      </div>
+      <div class="steps-row">
+        <div class="step-dot done" id="sdot1b">✓</div>
+        <div class="step-line done" id="sline1b"></div>
+        <div class="step-dot active" id="sdot2b">2</div>
+        <div class="step-line" id="sline2b"></div>
+        <div class="step-dot" id="sdot3b">3</div>
+      </div>
+      <div class="cards-grid" id="os-cards"></div>
+    </div>
+
+    <!-- Screen 3: Search -->
+    <div class="screen" id="screen-search">
+      <div class="screen-header">
+        <div class="mobile-logo"><span class="blue">Gimla</span><span class="purple">Tech</span> AI Helper</div>
+        <div class="breadcrumb">
+          <span onclick="goScreen('device')">🏠 מכשיר</span>
+          <span class="sep">‹</span>
+          <span onclick="goScreen('os')" id="bc-device2">—</span>
+          <span class="sep">‹</span>
+          <span class="current" id="bc-os">—</span>
+        </div>
+        <div class="screen-title">מה הבעיה?</div>
+      </div>
+      <div class="context-row">
+        <span class="ctx-tag" id="ctx-device">🖥️ מחשב</span>
+        <span class="ctx-tag" id="ctx-os">💻 Windows</span>
+      </div>
+      <div class="steps-row">
+        <div class="step-dot done">✓</div>
+        <div class="step-line done"></div>
+        <div class="step-dot done">✓</div>
+        <div class="step-line done"></div>
+        <div class="step-dot active">3</div>
+      </div>
+      <div class="search-box">
+        <input class="search-input" id="search-input" type="text" placeholder="הקלד את הבעיה... לדוגמה: אין אינטרנט, מחשב איטי" oninput="onSearch()" onkeydown="onSearchKey(event)">
+        <button class="search-btn" onclick="triggerAI()">🔍</button>
+      </div>
+      <div class="tags-row" id="tags-row"></div>
+      <div id="results-area"></div>
+      <div id="answer-area"></div>
+    </div>
+
+  </div><!-- main-content -->
+</div><!-- app-wrapper -->
+
+<!-- WhatsApp Float -->
+<button class="wa-float" onclick="openWaModal()">
+  <span>💬</span> וואטסאפ גימלאטק
+</button>
+
+<!-- WA Modal -->
+<div class="modal-overlay" id="wa-modal">
+  <div class="modal">
+    <div class="modal-title">💬 שלח בוואטסאפ</div>
+    <div class="modal-sub" id="modal-sub-text">הזן מספר טלפון של המבוגר לשליחת ההסבר (או השאר ריק לפתיחת צ'אט גימלאטק)</div>
+    <input class="modal-input" id="wa-phone" type="tel" placeholder="0501234567" maxlength="12">
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="sendWa()">📤 שלח</button>
+      <button class="btn-secondary" onclick="closeWaModal()">ביטול</button>
+    </div>
   </div>
 </div>
 
-<div class="app">
-
-  <!-- HEADER -->
-  <div class="header">
-    <div class="logo-row">
-      <span class="logo-icon">🛠️</span>
-      <span class="logo-text">Gimla<span>Tech</span></span>
-    </div>
-    <div class="breadcrumb" id="breadcrumb"></div>
-  </div>
-
-  <div class="body">
-
-    <!-- ══ מסך 1: בחירת מכשיר ══ -->
-    <div class="screen active" id="s1">
-      <div class="screen-title">במה לעזור?</div>
-      <div class="screen-sub">בחרו סוג המכשיר</div>
-      <div class="device-grid">
-        <div class="device-card" onclick="selectDevice('pc','💻','מחשב')">
-          <span class="icon">💻</span>
-          <div class="label">מחשב</div>
-        </div>
-        <div class="device-card" onclick="selectDevice('phone','📱','טלפון')">
-          <span class="icon">📱</span>
-          <div class="label">טלפון</div>
-        </div>
-        <div class="device-card" onclick="selectDevice('extra','🖨️','ציוד היקפי')">
-          <span class="icon">🖨️</span>
-          <div class="label">ציוד היקפי</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ מסך 2: מערכת הפעלה ══ -->
-    <div class="screen" id="s2">
-      <button class="btn-back" onclick="goBack(1)">← חזרה</button>
-      <div class="screen-title" id="s2-title"></div>
-      <div class="screen-sub">בחרו מערכת / דגם</div>
-      <div class="os-list" id="os-list"></div>
-    </div>
-
-    <!-- ══ מסך 3: חיפוש ══ -->
-    <div class="screen" id="s3">
-      <button class="btn-back" onclick="goBack(2)">← חזרה</button>
-
-      <!-- תיבת חיפוש -->
-      <div class="search-box">
-        <div class="search-go" id="search-go-btn" onclick="doSearch()">🔍</div>
-        <input type="text" id="search-input" placeholder="תארו את הבעיה..." oninput="onInput()" onkeydown="if(event.key==='Enter')doSearch()">
-      </div>
-
-      <!-- מסנן נושאים -->
-      <div class="topics-row" id="topics-row"></div>
-
-      <!-- תוצאות מאגר (מיידיות) -->
-      <div id="db-results-area"></div>
-
-      <!-- תשובת AI -->
-      <div id="ai-area" class="hidden">
-        <div class="ai-box">
-          <div class="ai-header">
-            <span class="ai-badge">✨ בינה מלאכותית</span>
-          </div>
-          <div id="ai-typing" class="ai-typing hidden">
-            <div class="dots"><span></span><span></span><span></span></div>
-            <span>מחשב תשובה...</span>
-          </div>
-          <div id="ai-content"></div>
-        </div>
-        <button class="btn-reset" onclick="resetAll()">🔄 בעיה חדשה</button>
-      </div>
-    </div>
-
-  </div><!-- /body -->
-
-  <!-- WhatsApp bar -->
-  <div class="wa-bar">
-    <a class="wa-btn" href="https://wa.me/972505396068" target="_blank">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      עזרה מגימלאטק — 0505396068
-    </a>
-  </div>
-
-  <!-- מודל הזנת מספר וואטסאפ -->
-  <div class="modal-overlay hidden" id="wa-modal" onclick="if(event.target===this)closePhoneModal()">
-    <div class="modal-box">
-      <div class="modal-title">📲 שלח תשובה בוואטסאפ</div>
-      <div class="modal-sub">הכניסו את מספר הטלפון של המקבל</div>
-      <input class="modal-input" id="wa-phone-input" type="tel" placeholder="050-000-0000"
-        onkeydown="if(event.key==='Enter')sendWANow()">
-      <div class="modal-error" id="wa-modal-error"></div>
-      <button class="modal-send" onclick="sendWANow()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        שלח עכשיו
-      </button>
-      <button class="modal-cancel" onclick="closePhoneModal()">ביטול</button>
-    </div>
-  </div>
-
-</div><!-- /app -->
-
-</div><!-- /page-wrap -->
-
 <script>
-// ══════════════════════════════════
-//   מאגר ידע
-// ══════════════════════════════════
-var WIN=['win'], MAC=['mac'], AND=['android'], IOS=['ios'], ALL=['win','mac','android','ios'], PC=['win','mac'], MOB=['android','ios'];
-var db=[
-  // אינטרנט
-  {id:'net-1',dev:WIN,cat:'🌐 אינטרנט',title:'אין אינטרנט — Windows',kw:['אינטרנט','חיבור','wifi','רשת','לא מתחבר','דפדפן','אתר'],steps:['לחצו על סמל WiFi בפינה ימנית תחתונה ← בדקו חיבור.','כבו ← הדליקו את ה-WiFi.','הפעילו מחדש את המחשב והנתב.'],tip:'💡 הנתב: כבו 30 שניות ← הדליקו. לרוב זה פותר.'},
-  {id:'net-2',dev:MAC,cat:'🌐 אינטרנט',title:'אין אינטרנט — Mac',kw:['אינטרנט','חיבור','wifi','רשת','לא מתחבר','safari'],steps:['סמל WiFi בשורת תפריטים ← כבו ← הדליקו.','Apple ← הגדרות מערכת ← Wi-Fi ← נסו לחבר שוב.','הפעילו מחדש Mac ונתב.'],tip:'💡 "שכחו" את הרשת ← התחברו מחדש.'},
-  {id:'net-3',dev:AND,cat:'🌐 אינטרנט',title:'אין אינטרנט — Android',kw:['אינטרנט','wifi','רשת','לא מתחבר','4g','נתונים'],steps:['הגדרות ← WiFi ← כבו ← הדליקו.','שכחו רשת ← התחברו מחדש עם הסיסמה.','כבו/הדליקו טלפון + נתב.'],tip:'📶 אם יש 4G — נסו לכבות WiFi ולהשתמש בנתונים.'},
-  {id:'net-4',dev:IOS,cat:'🌐 אינטרנט',title:'אין אינטרנט — iPhone',kw:['אינטרנט','wifi','רשת','לא מתחבר','safari','4g'],steps:['הגדרות ← WiFi ← כבו ← הדליקו.','לחצו על שם הרשת ← "שכח רשת זו" ← התחברו שוב.','כבו iPhone לגמרי ← הדליקו.'],tip:'✈️ נסו מצב טיסה 10 שניות ← כבו מצב טיסה.'},
-  {id:'net-5',dev:PC,cat:'🌐 אינטרנט',title:'הדפדפן איטי / לא נפתח',kw:['דפדפן','chrome','firefox','edge','איטי','לא נפתח','תקוע'],steps:['סגרו ופתחו מחדש.','מחקו היסטוריה: Ctrl+Shift+Delete.','נסו דפדפן אחר לבדיקה.'],tip:'🧹 ניקוי קאש מדי פעם מאיץ מאוד.'},
-  // הפעלה
-  {id:'pow-1',dev:WIN,cat:'⚡ הפעלה',title:'Windows לא עולה / מסך כחול',kw:['windows לא עולה','מסך כחול','כחול','bsod','עדכון תקוע'],steps:['כיבוי כפוי 3 פעמים ← Windows ינסה לתקן.','מסך כחול? רשמו קוד שגיאה ← פנו לגימלאטק.','עולה אבל איטי? המתינו — ייתכן עדכון ברקע.'],tip:'📞 מסך כחול קבוע = פנו לטכנאי.'},
-  {id:'pow-2',dev:MAC,cat:'⚡ הפעלה',title:'Mac לא נדלק',kw:['לא נדלק','לא עולה','כבה','mac','מסך שחור'],steps:['נייד? חברו לחשמל 10 דקות.','לחצו כפתור הפעלה 10 שניות.','Shift+Control+Option+Power יחד לאיפוס.'],tip:'🔧 אין תגובה? פנו לשירות Apple.'},
-  {id:'pow-3',dev:AND,cat:'⚡ הפעלה',title:'הטלפון לא נדלק — Android',kw:['לא נדלק','לא עולה','כבה','מסך שחור','מת'],steps:['חברו לטעינה 15 דקות.','לחצו כפתור הפעלה 10 שניות.','הפעלה + הורדת עוצמה יחד 15 שניות.'],tip:'🔋 סוללה מתרוקנת מהר? ייתכן שצריכה החלפה.'},
-  {id:'pow-4',dev:IOS,cat:'⚡ הפעלה',title:'iPhone לא נדלק',kw:['לא נדלק','לא עולה','כבה','מסך שחור','מת'],steps:['חברו לחשמל עם כבל מקורי 15 דקות.','הגבר עוצמה (מהיר) ← הנמך עוצמה (מהיר) ← החזיקו כפתור צד עד לוגו Apple.','לא עולה? פנו לחנות Apple.'],tip:'🔋 מטען לא מקורי יכול לגרום לבעיות.'},
-  // ביצועים
-  {id:'per-1',dev:WIN,cat:'❄️ ביצועים',title:'המחשב קפוא / תקוע — Windows',kw:['קפוא','תקוע','לא מגיב','קפא','נתקע','מסך קפוא'],steps:['המתינו 3 דקות.','Ctrl+Alt+Delete ← מנהל משימות ← סיימו תוכניות עם CPU גבוה.','כיבוי כפוי: כפתור הפעלה 10 שניות.'],tip:'💡 קופא לעתים? בדקו עדכונים ממתינים.'},
-  {id:'per-2',dev:WIN,cat:'❄️ ביצועים',title:'המחשב איטי מאוד — Windows',kw:['איטי','עובד לאט','נפתח לאט','תגובה איטית','ביצועים'],steps:['הפעילו מחדש.','Ctrl+Alt+Delete ← מנהל משימות ← סגרו תוכניות מיותרות.','בדקו מקום פנוי: C: ← לא פחות מ-10GB.'],tip:'🐢 מחשב ישן עם Windows 11 עלול להיות איטי.'},
-  {id:'per-3',dev:MAC,cat:'❄️ ביצועים',title:'Mac קפוא / גלגל מסתובב',kw:['קפוא','תקוע','לא מגיב','גלגל','spinning','איטי','mac'],steps:['המתינו מספר דקות.','Command+Option+Escape ← סגרו תוכניות תקועות.','כפתור הפעלה 10 שניות לכיבוי כפוי.'],tip:'💡 קופא לעתים? עדכנו macOS.'},
-  {id:'per-4',dev:AND,cat:'❄️ ביצועים',title:'הטלפון קפוא — Android',kw:['קפוא','תקוע','לא מגיב','קפא','איטי','אנדרואיד'],steps:['כפתור הפעלה 10 שניות לכיבוי כפוי.','המתינו 10 שניות ← הדליקו.','מחקו אפליקציות שלא משתמשים.'],tip:'💡 אפליקציה מסוימת גורמת? הסירו ותתקינו מחדש.'},
-  {id:'per-5',dev:IOS,cat:'❄️ ביצועים',title:'iPhone קפוא',kw:['קפוא','תקוע','לא מגיב','קפא','איטי','iphone'],steps:['הגבר עוצמה (מהיר) ← הנמך עוצמה (מהיר) ← החזיקו כפתור צד עד כיבוי.','המתינו 10 שניות ← הדליקו.','הגדרות ← כללי ← עדכון תוכנה.'],tip:'💡 iPhone ישן שקופא הרבה? שקלו שדרוג.'},
-  // קול
-  {id:'snd-1',dev:WIN,cat:'🔊 קול',title:'אין קול — Windows',kw:['קול','שמע','אין קול','רמקול','שקט','מושתק'],steps:['ודאו שעוצמת קול לא מכובה (סמל רמקול פינה ימנית תחתונה).','ימני על סמל רמקול ← הגדרות קול ← בחרו מכשיר נכון.','הפעילו מחדש.'],tip:'🎧 אוזניות מחוברות? הקול עלול להיות מופנה אליהן.'},
-  {id:'snd-2',dev:MOB,cat:'🔊 קול',title:'אין קול בטלפון',kw:['קול','שמע','אין קול','רמקול','שקט','השתקה'],steps:['ודאו שהמכשיר לא במצב שקט (בדקו צד המכשיר).','הגדרות ← קול ← הגבירו עוצמה.','הפעילו מחדש.'],tip:'🔕 iPhone: מתג הצד הקטן שולט על מצב שקט.'},
-  // וידאו שיחות
-  {id:'vid-1',dev:WIN,cat:'📷 וידאו שיחות',title:'זום לא עובד — Windows',kw:['זום','zoom','שיחה','וידאו','לא עובד'],steps:['סגרו ← פתחו מחדש.','ודאו שיש אינטרנט.','הגדרות זום ← וידאו/אודיו ← בחרו מצלמה ומיקרופון נכונים.'],tip:'📷 מצלמה תפוסה? סגרו Teams/Skype.'},
-  {id:'vid-2',dev:PC,cat:'📷 וידאו שיחות',title:'מצלמה לא עובדת — מחשב',kw:['מצלמה','וובקאם','webcam','לא עובדת','לא מזוהה'],steps:['הגדרות ← פרטיות ← מצלמה ← ודאו שמופעלת.','הפעילו מחדש.','מנהל התקנים ← מצלמות ← ימני ← עדכן.'],tip:'🔒 Windows חוסם מצלמה לפני קבלת הרשאה.'},
-  {id:'vid-3',dev:WIN,cat:'📷 וידאו שיחות',title:'WhatsApp Web לא עובד',kw:['whatsapp','web','ווטסאפ','qr','סריקה','ווואטסאפ'],steps:['פתחו whatsapp.com ← סרקו QR עם הטלפון.','ודאו שהטלפון מחובר לאינטרנט.','נסו דפדפן Chrome.'],tip:'📱 WhatsApp Web דורש שהטלפון יהיה מחובר לאינטרנט.'},
-  {id:'vid-4',dev:AND.concat(IOS),cat:'📷 וידאו שיחות',title:'WhatsApp — מצלמה לא עובדת',kw:['whatsapp','ווטסאפ','מצלמה','שיחת וידאו'],steps:['הגדרות ← אפליקציות ← WhatsApp ← הרשאות ← הפעילו מצלמה ומיקרופון.','סגרו WhatsApp ← פתחו מחדש.','עדכנו WhatsApp מחנות האפליקציות.'],tip:'📷 אפליקציה אחרת פתוחה עם המצלמה? סגרו אותה.'},
-  {id:'vid-5',dev:IOS,cat:'📷 וידאו שיחות',title:'FaceTime לא עובד',kw:['facetime','פייסטיים','שיחה','וידאו','apple'],steps:['הגדרות ← FaceTime ← ודאו שמופעל.','ודאו שיש אינטרנט.','כבו ← הדליקו.'],tip:'📞 FaceTime עובד רק בין מכשירי Apple.'},
-  // דואר
-  {id:'mail-1',dev:WIN,cat:'📧 דואר',title:'Outlook לא עובד',kw:['outlook','מייל','דואר','לא נפתח','לא עובד'],steps:['המתינו 30 שניות.','סגרו ממנהל משימות ← פתחו מחדש.','הפעילו מחדש.'],tip:'📧 בעיה קבועה? נסו outlook.com מהדפדפן.'},
-  {id:'mail-2',dev:ALL,cat:'📧 דואר',title:'לא מקבל מיילים',kw:['לא מקבל','מיילים','מייל','ספאם','זבל'],steps:['בדקו תיקיית ספאם/זבל.','ודאו שיש אינטרנט.','בדקו דרך דפדפן: gmail.com / outlook.com.'],tip:'📬 מגיע בדפדפן אבל לא באפליקציה? הבעיה בהגדרות האפליקציה.'},
-  // סיסמאות
-  {id:'sec-1',dev:WIN,cat:'🔒 סיסמאות',title:'שכחתי סיסמת Windows / PIN',kw:['סיסמה','שכחתי','pin','כניסה','נחסם','סיסמת כניסה'],steps:['מסך כניסה ← שכחתי את ה-PIN ← אפסו דרך Microsoft.','פנו לגימלאטק — איפוס דורש זהירות.'],tip:'🔑 כדאי לרשום סיסמאות במקום בטוח.'},
-  {id:'sec-2',dev:IOS,cat:'🔒 סיסמאות',title:'שכחתי קוד iPhone / Apple ID',kw:['סיסמה','שכחתי','קוד','apple id','נחסם','face id'],steps:['iTunes/Finder ← חברו iPhone ← שחזרו.','apple.com/account ← "שכחתי" ← אפסו.','פנו לחנות Apple עם תעודת זהות.'],tip:'⚠️ שחזור מוחק את כל המידע — גבו קודם!'},
-  {id:'sec-3',dev:AND,cat:'🔒 סיסמאות',title:'שכחתי קוד Android / Google',kw:['סיסמה','שכחתי','קוד','pin','google','נחסם'],steps:['נסו חשבון Google: "שכחתי את הסיסמה".','Samsung: Find My Mobile ← אפסו מרחוק.','איפוס מלא: הגדרות ← ניהול כללי ← איפוס.'],tip:'⚠️ איפוס מלא מוחק את כל המידע.'},
-  // סוללה
-  {id:'bat-1',dev:AND,cat:'🔋 סוללה',title:'הטלפון לא נטען — Android',kw:['טעינה','לא טוען','מטען','סוללה','חשמל'],steps:['נסו כבל טעינה אחר.','נקו שקע טעינה בעדינות עם קיסם.','נסו שקע חשמל אחר.'],tip:'🔋 מטען לא מקורי? ייתכן שלא נותן מספיק כוח.'},
-  {id:'bat-2',dev:IOS,cat:'🔋 סוללה',title:'iPhone לא נטען',kw:['טעינה','לא טוען','מטען','סוללה','lightning','usb-c'],steps:['נסו כבל מקורי אחר.','נקו שקע טעינה בעדינות.','נסו מטען / שקע חשמל אחר.'],tip:'⚡ כבל מקורי של Apple עדיף תמיד.'},
-  {id:'bat-3',dev:AND.concat(IOS),cat:'🔋 סוללה',title:'סוללה מתרוקנת מהר',kw:['סוללה','מתרוקנת','מהר','חיי סוללה','נגמר'],steps:['הגדרות ← סוללה ← בדקו איזו אפליקציה צורכת יותר.','כבו WiFi/Bluetooth כשלא משתמשים.','הנמיכו בהירות מסך.'],tip:'💡 סוללה ישנה מעל 3 שנים? ייתכן שצריכה החלפה.'},
-  // ציוד היקפי
-  {id:'ext-1',dev:ALL,cat:'🖨️ מדפסת',title:'המדפסת לא מדפיסה',kw:['מדפסת','הדפסה','לא מדפיס','תקוע','תור הדפסה'],steps:['בדקו שהמדפסת דלוקה ומחוברת.','Windows: מדפסות ← בדקו שהמדפסת לא "offline".','כבו מדפסת 30 שניות ← הדליקו.'],tip:'🖨️ תור הדפסה תקוע? מחקו את כל העבודות ונסו שוב.'},
-  {id:'ext-2',dev:PC,cat:'🖱️ עכבר / מקלדת',title:'עכבר / מקלדת לא עובדים',kw:['עכבר','מקלדת','לא מגיב','bluetooth','אלחוטי','חיבור'],steps:['חברו USB מחדש.','אלחוטי? בדקו / החליפו סוללות.','נסו בUSB אחר.','הפעילו מחדש מחשב.'],tip:'🔋 עכבר/מקלדת אלחוטיים: החלפת סוללה פותרת 90%.'},
-  {id:'ext-3',dev:PC,cat:'🖥️ מסך',title:'בעיית מסך / תצוגה',kw:['מסך','תצוגה','רזולוציה','לא מציג','hdmi','שחור'],steps:['ודאו שכבל HDMI מחובר היטב — הוציאו והכניסו.','Win+P ← בחרו מצב תצוגה.','הפעילו מחדש.'],tip:'🖥️ מסך חיצוני? ודאו שדלוק ועל הקלט הנכון.'},
+// ===== STATE =====
+let state = { device: null, deviceLabel: null, os: null, osLabel: null, activeTag: null, currentAnswer: null };
+
+// ===== KNOWLEDGE BASE =====
+const KB = [
+  // 🌐 Internet
+  {id:'i1',dev:['WIN','MAC','ALL'],cat:'🌐 אינטרנט',title:'אין חיבור לאינטרנט',kw:['אינטרנט','חיבור','wifi','רשת','לא מתחבר','נתק'],steps:['לחץ על סמל ה-WiFi בשורת המשימות (פינה ימין תחתון)','בדוק אם ה-WiFi מופעל — אם כבוי, לחץ עליו להפעלה','בחר את שם הרשת הביתית מהרשימה','הזן את הסיסמה של הרשת (אם נדרש)','אם לא עוזר — נתק את הנתב מהחשמל 30 שניות וחבר מחדש'],tip:'רוב בעיות האינטרנט נפתרות בהפעלה מחדש של הנתב. סיסמת הרשת מודפסת לרוב על גב הנתב.'},
+  {id:'i2',dev:['WIN','MAC','ALL'],cat:'🌐 אינטרנט',title:'האינטרנט איטי מאוד',kw:['איטי','אינטרנט איטי','גלישה איטית','טעינה'],steps:['נתק את הנתב מהחשמל, המתן 30 שניות, חבר מחדש','סגור טאבים ותוכנות שאינן בשימוש','בדוק שהמכשיר לא רחוק מדי מהנתב','אם אפשר, חבר כבל אינטרנט ישיר לנתב'],tip:'מרחק מהנתב משפיע מאוד על מהירות הרשת. מומלץ להיות באותו חדר.'},
+  {id:'i3',dev:['WIN','MAC','ALL'],cat:'🌐 אינטרנט',title:'הדפדפן לא נפתח',kw:['דפדפן','כרום','chrome','firefox','אפליקציה לא נפתחת','אתר'],steps:['לחץ פעמיים על סמל הדפדפן','המתן 30 שניות — לפעמים הדפדפן טוען לאט','אם לא נפתח, לחץ על הסמל בלחצן ימני ובחר "הפעל כמנהל"','הפעל מחדש את המחשב ונסה שוב'],tip:'אם הדפדפן תקוע, Ctrl+Alt+Delete → מנהל המשימות → סגור את הדפדפן ופתח מחדש.'},
+  {id:'i4',dev:['AND','IOS','MOB'],cat:'🌐 אינטרנט',title:'אין אינטרנט בטלפון',kw:['טלפון','אינטרנט','wifi','סלולר','נתונים'],steps:['החלק מלמעלה למטה לפתיחת הגדרות מהירות','ודא שה-WiFi מופעל ומחובר לרשת הנכונה','אם עדיין אין אינטרנט, הפעל/כבה מצב טיסה פעם אחת','נסה להפעיל מחדש את הטלפון','בדוק אם יש בעיה בנתב עם מכשיר אחר'],tip:'לחיצה ממושכת על סמל ה-WiFi תפתח הגדרות WiFi מלאות.'},
+  
+  // ⚡ הפעלה
+  {id:'p1',dev:['WIN','PC'],cat:'⚡ הפעלה',title:'המחשב לא נדלק',kw:['לא נדלק','לא עולה','לא מופעל','שחור','כיבוי'],steps:['ודא שכבל החשמל מחובר היטב לשקע ולמחשב','בדוק שהשקע עובד — חבר אליו מכשיר אחר','לחץ על כפתור ההפעלה ואחזוק 5 שניות','אם מחשב נייד — ודא שהסוללה טעונה','נסה לחבר לשקע אחר'],tip:'אם יש נורת LED על המחשב שלא דולקת כלל, ייתכן שהבעיה בחשמל ולא במחשב עצמו.'},
+  {id:'p2',dev:['WIN','PC'],cat:'⚡ הפעלה',title:'המחשב נכבה מעצמו',kw:['נכבה','מכבה','מתכבה','קורס','קפא'],steps:['ודא שהמחשב מאוורר היטב ולא חסומים פתחי האוורור','נקה את האבק מהמחשב בעדינות','ודא שהמחשב לא נמצא בחום ישיר של שמש','הפעל את Windows Update לעדכוני מערכת','אם ממשיך — פנה לטכנאי'],tip:'מחשב שמתחמם יתר על המידה נכבה אוטומטית כדי להגן על עצמו. אוורור תקין הוא קריטי.'},
+  {id:'p3',dev:['AND','MOB'],cat:'⚡ הפעלה',title:'הטלפון קפא / לא מגיב',kw:['קפא','תקוע','לא מגיב','מקפיא'],steps:['לחץ ממושכת על כפתור ההפעלה 10 שניות לכיבוי כפוי','המתן 30 שניות','הדלק מחדש','אם קורה לעיתים קרובות — ודא שיש מקום פנוי בזיכרון הטלפון'],tip:'כיבוי כפוי בעזרת לחיצה ארוכה על כפתור ההפעלה הוא בטוח לחלוטין ולא יפגע בנתונים.'},
+  {id:'p4',dev:['IOS','MOB'],cat:'⚡ הפעלה',title:'אייפון/אייפד לא נדלק',kw:['אייפון','לא נדלק','מסך שחור','iphone'],steps:['חבר לטעינה ב-15 דקות לפחות — ייתכן שהסוללה ריקה לחלוטין','לחץ ממושכת על כפתור ה-Power + Volume Down עד שמופיע לוגו Apple','אם רואה "Connect to iTunes" — חבר למחשב','נסה כבל טעינה שונה'],tip:'אייפון עם סוללה שרוקנה לגמרי עלול לקחת עד 15 דקות של טעינה לפני שמפעיל עצמו.'},
+  
+  // ❄️ ביצועים
+  {id:'s1',dev:['WIN','PC'],cat:'❄️ ביצועים',title:'המחשב איטי מאוד',kw:['איטי','אטי','כבד','איטיות','פועל לאט'],steps:['הפעל מחדש את המחשב (לא רק כיבוי מסך)','סגור תוכנות שאינן בשימוש','לחץ Ctrl+Alt+Delete → מנהל המשימות → סגור תוכנות שצורכות הרבה CPU','נקה קבצים זמניים: Win+R → הקלד "temp" → Enter → מחק הכל','ודא שנותרו 10% שטח פנוי בדיסק'],tip:'הפעלה מחדש פעם ביום משפרת משמעותית את ביצועי המחשב. אל תאפשר למחשב לרוץ שבועות ללא הפעלה מחדש.'},
+  {id:'s2',dev:['WIN','PC'],cat:'❄️ ביצועים',title:'המחשב מלא — אין מקום',kw:['מלא','אין מקום','דיסק','אחסון','נפח'],steps:['פתח סייר קבצים ← לחץ ימני על "דיסק מקומי C:"','בחר "מאפיינים" לראות כמה מקום נותר','עבור ל-Start → הגדרות → מערכת → אחסון','לחץ על "הסרת קבצים זמניים"','מחק תמונות וסרטים ישנים שאינך צריך'],tip:'יש לשמור לפחות 15% מקום פנוי בדיסק לביצועים תקינים. שקול גיבוי תמונות לענן.'},
+  {id:'s3',dev:['AND','MOB'],cat:'❄️ ביצועים',title:'הטלפון איטי',kw:['טלפון איטי','אפליקציות איטיות','איטי'],steps:['הפעל מחדש את הטלפון','עבור להגדרות → אפליקציות → מחק נתוני מטמון','מחק אפליקציות שאינך משתמש בהן','ודא שיש לפחות 1GB מקום פנוי בזיכרון','עדכן את הטלפון לגרסה האחרונה'],tip:'מחיקת מטמון (Cache) היא בטוחה לחלוטין — זה כמו לנקות אבק מהטלפון.'},
+  
+  // 🔊 קול
+  {id:'a1',dev:['WIN','MAC','PC'],cat:'🔊 קול',title:'אין קול מהמחשב',kw:['קול','שמע','אין קול','שקט','רמקול','שמע'],steps:['בדוק שהרמקולים מחוברים ומופעלים','לחץ על סמל הרמקול בשורת המשימות ובדוק שהעוצמה לא מוגדרת על 0','ודא שאין כפתור Mute לחוץ','לחץ ימני על סמל הרמקול ← "פתח הגדרות קול"','ודא שמכשיר ההפעלה הנכון נבחר'],tip:'לעיתים Windows בוחר מכשיר קול שגוי אחרי עדכון. בדוק שנבחרו הרמקולים הנכונים.'},
+  {id:'a2',dev:['WIN','PC'],cat:'🔊 קול',title:'מיקרופון לא עובד',kw:['מיקרופון','לא שומעים','אני לא נשמע','שיחה'],steps:['לחץ ימני על סמל הרמקול → "פתח הגדרות קול"','גלול למטה לסעיף "קלט"','ודא שנבחר המיקרופון הנכון','דבר לתוך המיקרופון ובדוק שהמחוון זז','ודא שהאפליקציה (זום/מייסרוס) קיבלה הרשאת מיקרופון'],tip:'בזום: לחץ על החץ ליד המיקרופון לבחירת המיקרופון הנכון.'},
+  {id:'a3',dev:['AND','IOS','MOB'],cat:'🔊 קול',title:'אין קול בטלפון',kw:['קול','שמע','שקט','רמקול','טלפון'],steps:['בדוק שהטלפון לא במצב שקט (מצב רטט)','לחץ על כפתורי עוצמת הקול בצד הטלפון','גלול ממש ממטה למעלה ולחץ על הסמל של הרמקול','הוצא ותחזיר אוזניות אם מחוברות','הפעל מחדש את הטלפון'],tip:'רוב הטלפונים מכניסים עצמם למצב שקט בעת כניסה לשקע אוזניות — הוצאת האוזניות תחזיר את הקול.'},
+  
+  // 📷 וידאו שיחות
+  {id:'v1',dev:['WIN','MAC','ALL'],cat:'📷 וידאו שיחות',title:'מצלמה לא עובדת בזום',kw:['זום','zoom','מצלמה','לא רואים','שיחת וידאו','teams'],steps:['פתח זום ועבור ל-Settings (הגדרות)','בחר Video ובדוק שנבחרה המצלמה הנכונה','ודא שלא פתוחה תוכנה אחרת שמשתמשת במצלמה','הפעל מחדש את זום','ב-Windows: הגדרות → פרטיות ואבטחה → מצלמה → ודא שזום מאושר'],tip:'רק תוכנה אחת יכולה להשתמש במצלמה בו זמנית. סגור Teams, Skype, ו-WhatsApp Web לפני פתיחת זום.'},
+  {id:'v2',dev:['WIN','MAC','ALL'],cat:'📷 וידאו שיחות',title:'קול לא עובד בזום',kw:['זום','קול','לא שומעים','שיחה','אודיו'],steps:['בזום — לחץ על החץ ליד כפתור ה-Mute','בחר "בדוק קול רמקול ומיקרופון"','ודא שנבחרו הרמקולים והמיקרופון הנכונים','לחץ על Join Audio אם מופיע כפתור זה','נסה לצאת ולחזור לשיחה'],tip:'לחץ על מקש הרווח בזום כדי לבטל Mute זמנית בזמן שאתה מדבר.'},
+  {id:'v3',dev:['AND','IOS','MOB'],cat:'📷 וידאו שיחות',title:'שיחת וידאו קופאת בוואטסאפ',kw:['וואטסאפ','שיחת וידאו','קופא','ניתוק','WhatsApp'],steps:['ודא שיש חיבור WiFi חזק (לא סלולר)','סגור אפליקציות אחרות הפועלות ברקע','ודא שיש מקום פנוי בטלפון','הפעל מחדש את וואטסאפ','אם נמשך — הפעל מחדש את הטלפון'],tip:'שיחות וידאו דורשות חיבור אינטרנט טוב. אם ה-WiFi חלש, נסה להתקרב לנתב.'},
+  
+  // 📧 דואר ואפליקציות
+  {id:'e1',dev:['WIN','MAC','ALL'],cat:'📧 דואר ואפליקציות',title:'לא מצליח לשלוח דואר',kw:['דואר','מייל','לא שולח','Gmail','outlook','אאוטלוק'],steps:['ודא שיש חיבור לאינטרנט','ודא שלא חרגת ממגבלת הנפח של תיבת הדואר','בדוק תיקיית "טיוטות" — ייתכן שהמייל נשמר שם','נסה לסגור ולפתח מחדש את אפליקציית הדואר','כנס לאתר הדואר ישירות (gmail.com / outlook.com) במקום האפליקציה'],tip:'אם קיבלת הודעה "תיבת הדואר מלאה" — מחק מיילים ישנים ובעיקר מיילים עם קבצים גדולים.'},
+  {id:'e2',dev:['WIN','MAC','ALL'],cat:'📧 דואר ואפליקציות',title:'שכחתי סיסמת Gmail',kw:['סיסמה','שכחתי','gmail','גוגל','כניסה'],steps:['עבור ל-gmail.com ולחץ "שכחתי סיסמה"','בחר אופציה לאימות זהות: SMS לטלפון, מייל אחר, או שאלת אבטחה','עקוב אחר ההוראות לאיפוס הסיסמה','בחר סיסמה חדשה וחזקה (8+ תווים עם מספרים)','רשום את הסיסמה במקום בטוח'],tip:'הסיסמה הטובה ביותר היא שילוב של 3 מילים מוכרות + מספרים, לדוגמה: שולחן_ירוק_7!'},
+  {id:'e3',dev:['ALL'],cat:'📧 דואר ואפליקציות',title:'לא מצליח להוריד קובץ מהמייל',kw:['קובץ','הורדה','קבצים','מייל','PDF','מסמך'],steps:['לחץ על הקובץ המצורף במייל','בחר "הורד" או "שמור"','פתח את תיקיית "Downloads" (הורדות) במחשב/טלפון','אם הורדה נחסמת — ודא שמדובר בשולח מוכר ואמין','אם PDF לא נפתח — הורד Adobe Reader בחינם'],tip:'קבצים שהורדת נמצאים בתיקיית "הורדות". בטלפון: גלרית הקבצים ← תיקיית הורדות.'},
+  
+  // 🔒 סיסמאות
+  {id:'pw1',dev:['ALL'],cat:'🔒 סיסמאות',title:'שכחתי סיסמה לאפליקציה',kw:['סיסמה','שכחתי','כניסה','התחברות','חסום'],steps:['חפש כפתור "שכחתי סיסמה" בדף הכניסה','הזן את כתובת המייל שלך','בדוק את תיבת המייל שלך להודעת איפוס','לחץ על הקישור במייל ועקוב אחר ההוראות','בחר סיסמה חדשה וחזקה'],tip:'מומלץ לרשום סיסמאות במחברת פיזית ולשמור במקום בטוח בבית.'},
+  {id:'pw2',dev:['WIN','PC'],cat:'🔒 סיסמאות',title:'שכחתי סיסמת Windows',kw:['סיסמה','windows','כניסה','נעול','מסך נעילה'],steps:['הקלד את הסיסמה בעדינות — שים לב ל-Caps Lock','לחץ על סמל "עין" לצד שדה הסיסמה לראות מה הוקלד','אם לא זוכר — לחץ "שכחתי PIN" מתחת לשדה','כנס עם חשבון Microsoft שלך לאיפוס','אם אין חשבון Microsoft — פנה לטכנאי'],tip:'הכפתור Caps Lock גורם לאותיות הפוכות — ודא שהוא כבוי לפני הקלדת הסיסמה.'},
+  
+  // 🔋 סוללה
+  {id:'b1',dev:['AND','IOS','MOB'],cat:'🔋 סוללה',title:'הטלפון נפרק מהר',kw:['סוללה','פריקה','נגמר','שעה','מטען'],steps:['עבור להגדרות → סוללה → ראה אילו אפליקציות צורכות הכי הרבה','הפחת בהירות המסך ב-30%','כבה Bluetooth ו-GPS כשאינך משתמש בהם','הפעל "מצב חיסכון בסוללה"','ודא שמסך לא נדלק אוטומטי — הגדר נעילה אוטומטית ל-30 שניות'],tip:'המסך הוא צרכן החשמל הגדול ביותר. הפחתת הבהירות ב-50% מאריכה את חיי הסוללה משמעותית.'},
+  {id:'b2',dev:['AND','IOS','MOB'],cat:'🔋 סוללה',title:'הטלפון לא נטען',kw:['לא נטען','טעינה','מטען','USB','חיבור'],steps:['נסה כבל טעינה אחר — הכבל נשחק לעיתים','נסה שקע חשמל אחר','בדוק שאין לכלוך בחיבור הטעינה של הטלפון — נקה בעדינות','הפעל מחדש את הטלפון ונסה לטעון שוב','נסה מטען אחר (לוח)'],tip:'כבלי טעינה נשחקים מהר, במיוחד אם גוררים אותם. מומלץ להחזיר כבל בכניסה לחיבור ולא למשוך בכוח.'},
+  
+  // 💾 גיבוי
+  {id:'bk1',dev:['AND','MOB'],cat:'💾 גיבוי',title:'גיבוי תמונות לגוגל',kw:['גיבוי','תמונות','גוגל','Google Photos','ענן'],steps:['הורד "Google Photos" מחנות Play אם לא מותקן','פתח את האפליקציה וכנס עם חשבון Google','עבור להגדרות → גיבוי → הפעל גיבוי','בחר "חסכון באחסון" לגיבוי בחינם ללא הגבלה','המתן עד שהגיבוי יסתיים (זה עלול לקחת זמן בפעם הראשונה)'],tip:'הגיבוי עובד רק כשמחובר WiFi. ודא שהטלפון מחובר לרשת הביתית כשהגיבוי רץ.'},
+  {id:'bk2',dev:['IOS','MOB'],cat:'💾 גיבוי',title:'גיבוי אייפון לiCloud',kw:['גיבוי','iCloud','אייפון','ענן','תמונות'],steps:['עבור להגדרות → לחץ על שמך בראש המסך','בחר iCloud → גיבוי iCloud → הפעל','לחץ "גיבוי עכשיו"','המתן עד שהגיבוי יסיים (הטלפון צריך להיות מחובר לחשמל ו-WiFi)','בדוק שהגיבוי הצליח תחת "גיבוי אחרון"'],tip:'לגיבוי תקין, הטלפון צריך להיות: מחובר לחשמל + WiFi + מסך נעול. לילה הוא הזמן האידיאלי.'},
+  {id:'bk3',dev:['WIN','PC'],cat:'💾 גיבוי',title:'גיבוי קבצים למחשב',kw:['גיבוי','קבצים','מסמכים','USB','דיסק'],steps:['חבר כונן USB או דיסק חיצוני למחשב','פתח "מחשב זה" בסייר קבצים','העתק את תיקיות "מסמכים", "תמונות", "שולחן עבודה" לכונן החיצוני','המתן עד שהעתקה תסתיים','נתק את הכונן בבטחה (לחץ ימני → הוצא בבטחה)'],tip:'גבה לפחות פעם בחודש. הכי טוב לעשות גיבוי לפני כל עדכון גדול של Windows.'},
+  
+  // ⚙️ הגדרות
+  {id:'st1',dev:['WIN','PC'],cat:'⚙️ הגדרות',title:'שינוי גודל גופן/טקסט',kw:['גופן','גודל','טקסט','מסך','הגדלה','נגישות','קטן'],steps:['לחץ ימני על שולחן העבודה ← "הגדרות תצוגה"','גלול למטה לסעיף "קנה מידה ופריסה"','בדוק את הגדרת "שנה גודל טקסט, אפליקציות..."','הגדל ל-125% או 150% לטקסט גדול יותר','לחץ "החל" ונסה אם הגודל מתאים'],tip:'הגדלת הצגה ל-125% מקלה מאוד על קריאה מבלי לפגוע בשימושיות המחשב.'},
+  {id:'st2',dev:['AND','MOB'],cat:'⚙️ הגדרות',title:'הגדלת גודל טקסט בטלפון',kw:['גופן','גודל','טקסט','גדול','נגישות','קטן'],steps:['עבור להגדרות → נגישות','חפש "גודל גופן" או "גודל תצוגה"','הזז את המחוון שמאלה לגופן גדול יותר','ניתן גם ל-3 אצבעות ולהגדיל עם פינץ\' (צביטה) בכל מקום','בדוק שהשינוי מתאים'],tip:'ב-Android: הגדרות → נגישות → גודל גופן. ניתן להגדיל עד 200%.'},
+  {id:'st3',dev:['IOS','MOB'],cat:'⚙️ הגדרות',title:'הגדלת גופן באייפון',kw:['גופן','גדול','אייפון','נגישות'],steps:['עבור להגדרות → נגישות','לחץ "תצוגה ועיצוב טקסט"','לחץ "גופן גדול יותר"','הזז את המחוון ימינה לגופן גדול יותר','חזור ובדוק שהשינוי מתאים'],tip:'ב-iPhone: הגדרות → מרכז בקרה → הוסף "גודל טקסט" לגישה מהירה ממרכז הבקרה.'},
+  {id:'st4',dev:['WIN','PC'],cat:'⚙️ הגדרות',title:'שינוי שפת מקלדת',kw:['מקלדת','שפה','עברית','אנגלית','עיברית'],steps:['לחץ על שורת המשימות על שם השפה הנוכחית (HEB/ENG)','בחר את השפה הרצויה מהרשימה','או לחץ Alt+Shift כדי להחליף שפה מהיר','לתוספת שפה: הגדרות → זמן ושפה → שפה'],tip:'קיצור המקלדת להחלפת שפה ב-Windows הוא Alt+Shift. ניתן לשנות קיצור זה בהגדרות.'},
+  
+  // 🖨️ ציוד היקפי
+  {id:'pr1',dev:['WIN','MAC','PC'],cat:'🖨️ ציוד היקפי',title:'מדפסת לא עובדת',kw:['מדפסת','הדפסה','לא מדפיס','נייר','דיו'],steps:['ודא שהמדפסת מופעלת ומחוברת (כבל USB או WiFi)','על המחשב: הגדרות → Bluetooth ומכשירים → מדפסות','ודא שהמדפסת שלך מופיעה ולא "לא מקוון"','לחץ ימני על המדפסת ← "הגדר כברירת מחדל"','הפעל מחדש את המדפסת והמחשב'],tip:'אם המדפסת מופיעה "לא מקוון" — כבה אותה, המתן 10 שניות, הפעל מחדש ונסה שוב.'},
+  {id:'pr2',dev:['WIN','PC'],cat:'🖨️ ציוד היקפי',title:'עכבר/מקלדת לא עובדים',kw:['עכבר','מקלדת','לא עובד','USB','bluetooth'],steps:['בדוק שהעכבר/מקלדת מחוברים היטב ל-USB','נסה חיבור ל-USB אחר','אם אלחוטי — בדוק ורשם את הסוללות','כבה והדלק מחדש את המכשיר','נסה לחבר למחשב אחר לבדיקה'],tip:'עכבר אלחוטי מפסיק לעבוד כשהסוללות חלשות גם אם לא ריקות לגמרי — החלף סוללות.'},
+  {id:'pr3',dev:['WIN','PC'],cat:'🖨️ ציוד היקפי',title:'אין תמונה על המסך',kw:['מסך','אין תמונה','שחור','כבוי','HDMI'],steps:['ודא שכבל ה-HDMI/VGA מחובר היטב לשני הקצוות','לחץ על כפתור Input/Source במסך לבחירת מקור נכון','ודא שהמסך מופעל (כפתור הפעלה)','הפעל מחדש את המחשב','נסה כבל HDMI אחר'],tip:'לחיצה על Win+P מאפשרת בחירת מצב תצוגה — נסה "מצב שכפול" או "הרחב".'},
+  {id:'pr4',dev:['WIN','PC'],cat:'🖨️ ציוד היקפי',title:'WiFi לא מזוהה במחשב',kw:['wifi','רשת','לא מזוהה','חיבור','אינטרנט'],steps:['ודא שסמל ה-WiFi מופיע בשורת המשימות','לחץ ימני על סמל הרשת ← "פתרון בעיות"','אם אין סמל WiFi: הגדרות → רשת ואינטרנט','הפעל/כבה WiFi','הפעל מחדש את המחשב'],tip:'לפעמים עדכון Windows משבש מנהלי התקן WiFi. אם בעיה מתמשכת — פנה לתמיכה.'},
+  
+  // הוספת פתרונות נוספים לכלל הקטגוריות
+  {id:'i5',dev:['WIN','PC'],cat:'🌐 אינטרנט',title:'הכרטיסייה קפאה בדפדפן',kw:['כרטיסייה','קפאה','דפדפן','טאב'],steps:['לחץ Ctrl+W לסגירת הכרטיסייה','אם לא עובד — לחץ Ctrl+Alt+Delete → מנהל משימות','מצא את הדפדפן ולחץ "סיים משימה"','פתח את הדפדפן מחדש','נסה לפתוח את האתר בכרטיסייה חדשה (Ctrl+T)'],tip:'אם דפדפן קופא לעיתים קרובות, נסה לנקות מטמון: Ctrl+Shift+Delete.'},
+  {id:'e4',dev:['ALL'],cat:'📧 דואר ואפליקציות',title:'וואטסאפ לא עובד',kw:['וואטסאפ','WhatsApp','הודעה','שליחה'],steps:['ודא שיש חיבור לאינטרנט','סגור את וואטסאפ לחלוטין ופתח מחדש','בדוק עדכונים בחנות האפליקציות','הפעל מחדש את הטלפון','אם נמשך — מחק מטמון: הגדרות → אפליקציות → וואטסאפ → מחק מטמון'],tip:'ווטסאפ מחייב חשבון טלפון פעיל. אם מספר הטלפון השתנה — יש לרשום את החשבון מחדש.'},
+  {id:'e5',dev:['WIN','PC'],cat:'📧 דואר ואפליקציות',title:'אאוטלוק לא מסתנכרן',kw:['outlook','אאוטלוק','מייל','סינכרון'],steps:['ודא שיש חיבור לאינטרנט','לחץ Send/Receive All Folders (F9)','בדוק שהחשבון מחובר: קובץ → הגדרות חשבון','נסה לצאת ולהיכנס מחדש לחשבון','הפעל מחדש את אאוטלוק'],tip:'Outlook מתחבר לשרת כל 30 דקות כברירת מחדל. לקבלה מיידית — לחץ F9.'},
+  {id:'v4',dev:['WIN','ALL'],cat:'📷 וידאו שיחות',title:'Teams לא נפתח',kw:['teams','מיקרוסופט','לא נפתח','עבודה'],steps:['חפש את Teams ב-Start וודא שמותקן','נסה לפתוח דרך הדפדפן: teams.microsoft.com','ודא שמחובר לאינטרנט','הפעל מחדש את המחשב','אם נדרש — הורד מחדש מ-microsoft.com/teams'],tip:'Teams אפשר להשתמש גם דרך הדפדפן ללא התקנה — כנס ל-teams.microsoft.com.'},
+  {id:'pw3',dev:['AND','IOS'],cat:'🔒 סיסמאות',title:'נעילת טלפון שכחתי קוד',kw:['קוד','PIN','נעילה','שכחתי','טלפון נעול'],steps:['אחרי 5 ניסיונות כושלים תוצג אפשרות "שכחתי קוד"','לחץ "שכחתי קוד" והיכנס עם חשבון Google/Apple שלך','לחץ "אפס נעילת מסך"','בחר קוד חדש','אם לא עובד — גבה את המכשיר ואפס להגדרות יצרן'],tip:'רשום את הקוד בצורה מוסווית במקום בטוח — לדוגמה, ברשימת טלפונים תחת שם בדוי.'},
+  {id:'st5',dev:['WIN','PC'],cat:'⚙️ הגדרות',title:'שעון מחשב לא נכון',kw:['שעה','תאריך','שעון','לא נכון'],steps:['לחץ ימני על השעון בשורת המשימות','בחר "כוונן תאריך/שעה"','הפעל "הגדר שעה אוטומטית"','לחץ "סנכרן עכשיו"','ודא שאזור הזמן מוגדר ל"ירושלים"'],tip:'שעה לא נכונה יכולה לגרום לבעיות בחיבורים מאובטחים ואתרים. ודא שהיא תמיד מסונכרנת.'},
+  {id:'b3',dev:['AND','IOS'],cat:'🔋 סוללה',title:'סוללה מתחממת בטעינה',kw:['חום','מתחמם','טעינה','סוללה'],steps:['הסר את כיסוי הטלפון בזמן טעינה','הנח את הטלפון על משטח קשה ולא על בד','ודא שמשתמש במטען המקורי','אל תשתמש בטלפון בזמן טעינה לפעולות כבדות','אם חם מאוד — כבה את הטלפון לטעינה'],tip:'חום קל בזמן טעינה הוא נורמלי. חום שלא ניתן לנגוע בו — כבה מיד ופנה לשירות.'},
+  {id:'bk4',dev:['WIN','PC'],cat:'💾 גיבוי',title:'גיבוי ל-OneDrive',kw:['OneDrive','גיבוי','ענן','מיקרוסופט'],steps:['פתח OneDrive (ענן לבן בשורת המשימות)','כנס עם חשבון Microsoft שלך','לחץ על הגדרות OneDrive','בחר אילו תיקיות לגבות (מסמכים, תמונות, שולחן עבודה)','לחץ "התחל גיבוי"'],tip:'OneDrive מגבה אוטומטית בכל שמירה. ניתן לגשת לקבצים מכל מכשיר עם חשבון Microsoft.'},
+  {id:'pr5',dev:['WIN','PC'],cat:'🖨️ ציוד היקפי',title:'מדפסת תקועה — נייר תקוע',kw:['נייר תקוע','מדפסת','תקיעה','jam'],steps:['כבה את המדפסת לפני הכל','פתח את כל דלתות/מגשי הגישה למדפסת','משוך את הנייר בעדינות לכיוון שבו הוא נע','ודא שלא נשאר קרע נייר בתוך המדפסת','הפעל מחדש וכוון להדפיס'],tip:'תמיד כבה מדפסת לפני שליפת נייר תקוע. משיכה בכוח יכולה לפגוע במנגנון.'},
+  {id:'pr6',dev:['WIN','ALL'],cat:'🖨️ ציוד היקפי',title:'מדפסת — דיו אזלה',kw:['דיו','דיו נגמר','צבע','הדפסה חיוורת'],steps:['בדוק את מפלס הדיו: פתח "מכשירים ומדפסות" ← לחץ ימני על המדפסת','בחר "העדפות הדפסה" ← "עוצמת דיו"','אם דיו נמוכה — הזמן מחסנית תואמת','לחציית "הדפס בשחור-לבן" לחיסכון בדיו צבעוני','החלף מחסנית לפי הוראות היצרן'],tip:'צלם את מספר המחסנית לפני שהולכים לקנות — הוא מופיע על המחסנית הקיימת.'},
+  {id:'i6',dev:['ALL'],cat:'🌐 אינטרנט',title:'אתר מציג שגיאת אבטחה',kw:['אבטחה','שגיאה','SSL','אתר לא בטוח','אזהרה'],steps:['בדוק שתאריך ושעה במחשב/טלפון נכונים','נסה לפתוח את האתר בחלון פרטי (Ctrl+Shift+N)','נסה דפדפן אחר','אם האתר בנק/ממשלתי — ודא שהכתובת מדויקת','אל תמשיך לאתר שמציג אזהרה חריפה'],tip:'אתרים לגיטימיים כמו בנקים וממשל.זיו תמיד מאובטחים. אם מופיעה אזהרה — בדוק שהכתובת נכונה לפני כניסה.'},
+  {id:'a4',dev:['WIN','PC'],cat:'🔊 קול',title:'קול צורם / איכות קול גרועה',kw:['קול גרוע','צורם','שמע','אכות','נפח'],steps:['בדוק שכבלי הרמקולים מחוברים היטב','הפחת עוצמת קול ל-70% ובדוק אם ממשיך','לחץ ימני על סמל רמקול ← "Sound Settings"','בחר את הרמקולים ← "Properties" ← כבה שיפורי קול','ודא שאין תוכנת EQ שמשפיעה'],tip:'שיפורי קול של Windows לפעמים גורמים לעיוות. כיבויים מוביל בד"כ לשיפור.'},
+  {id:'s4',dev:['WIN','PC'],cat:'❄️ ביצועים',title:'Windows Update תקוע',kw:['עדכון','windows update','תקוע','עדכונים'],steps:['המתן בסבלנות — עדכונים גדולים יכולים לקחת שעה','ודא שלא מנתקים חשמל בזמן עדכון','אחרי עדכון — הפעל מחדש גם אם לא נדרש','אם תקוע מעל שעה: Win+R → "services.msc" → Windows Update → Stop ← Start'],tip:'מומלץ לעשות עדכוני Windows בלילה כשלא משתמשים. הם חיוניים לאבטחה.'},
+  {id:'s5',dev:['WIN','PC'],cat:'❄️ ביצועים',title:'תוכנה לא מסתגרת',kw:['לא נסגרת','תקועה','תוכנה','לא מגיבה','סגירה'],steps:['לחץ Ctrl+Alt+Delete','בחר "מנהל המשימות"','מצא את התוכנה הבעייתית ברשימה','לחץ עליה ← "סיים משימה"','פתח את התוכנה מחדש'],tip:'Ctrl+Alt+Delete הוא "כפתור הצלה" שתמיד עובד גם כשמחשב קפוא.'},
+  {id:'v5',dev:['AND','IOS'],cat:'📷 וידאו שיחות',title:'מצלמת טלפון לא עובדת',kw:['מצלמה','צילום','לא עובדת','תמונה','אפליקציה'],steps:['סגור את אפליקציית המצלמה לחלוטין ופתח מחדש','ודא שאפליקציה אחרת לא משתמשת במצלמה (זום, וואטסאפ)','הפעל מחדש את הטלפון','ודא שיש מקום פנוי לתמונות חדשות','נקה את עדשת המצלמה בעדינות'],tip:'אם עדשת המצלמה מחושכת — היא ייתכן מכוסה באצבע או כיסוי לא מתאים.'},
+  {id:'e6',dev:['AND','IOS'],cat:'📧 דואר ואפליקציות',title:'אפליקציה לא מגיבה',kw:['אפליקציה','קרסה','לא מגיבה','תקועה'],steps:['לחץ על כפתור הגיבורים (ריבוע/שלושה קווים)','מצא את האפליקציה הבעייתית ובצע החלקה לסגירה','פתח מחדש את האפליקציה','אם ממשיך — עבור להגדרות → אפליקציות → מחק מטמון','כאחרון — הסר והתקן מחדש את האפליקציה'],tip:'מחיקת מטמון לא מוחקת נתונים אישיים — זה בטוח לחלוטין לנסות.'},
+  {id:'pw4',dev:['WIN','PC'],cat:'🔒 סיסמאות',title:'סיסמת WiFi — איך לראות',kw:['סיסמת wifi','רשת','סיסמה','שכחתי wifi'],steps:['לחץ על סמל WiFi בשורת המשימות','לחץ ימני על שם הרשת שמחובר אליה','בחר "מאפיינים"','גלול למטה ועבור ל"מאפיינים נוספים"','לחץ על "עין" ליד "מפתח אבטחה" לחשיפת הסיסמה'],tip:'ניתן לראות סיסמת WiFi רק כשמחוברים לרשת. שמור את הסיסמה בנייד לשימוש עתידי.'},
 ];
 
-// ══════════════════════════════════
-//   סטייט
-// ══════════════════════════════════
-var state = { device: null, deviceLabel: '', os: null, osLabel: '', screen: 1 };
-var OS_MAP = {
-  pc:    [{id:'win',   icon:'🪟', label:'Windows',      desc:'מחשב שולחני / נייד'},
-          {id:'mac',   icon:'🍎', label:'Mac / MacBook', desc:'מוצרי Apple'}],
-  phone: [{id:'android',icon:'🤖',label:'Android',       desc:'Samsung, Xiaomi, וכו׳'},
-          {id:'ios',   icon:'📱', label:'iPhone',         desc:'אפל iPhone'}],
-  extra: [{id:'win',   icon:'🖥️', label:'Windows',       desc:'מחשב לציוד'},
-          {id:'mac',   icon:'🍎', label:'Mac',            desc:'מק לציוד'}]
+// Categories
+const CATS = ['🌐 אינטרנט','⚡ הפעלה','❄️ ביצועים','🔊 קול','📷 וידאו שיחות','📧 דואר ואפליקציות','🔒 סיסמאות','🔋 סוללה','💾 גיבוי','⚙️ הגדרות','🖨️ ציוד היקפי'];
+
+// OS options per device
+const OS_MAP = {
+  computer: [
+    {id:'WIN',label:'Windows',icon:'🪟',sub:'Windows 10/11'},
+    {id:'MAC',label:'Mac',icon:'🍎',sub:'macOS'},
+  ],
+  phone: [
+    {id:'AND',label:'Android',icon:'🤖',sub:'Samsung, Xiaomi...'},
+    {id:'IOS',label:'iPhone',icon:'🍎',sub:'iOS / iPadOS'},
+  ],
+  peripheral: [
+    {id:'PC',label:'מחובר למחשב',icon:'🖥️',sub:'Windows'},
+    {id:'MOB',label:'מחובר לטלפון',icon:'📱',sub:'Android / iOS'},
+  ],
+  tablet: [
+    {id:'AND',label:'Android',icon:'🤖',sub:'Samsung, Lenovo...'},
+    {id:'IOS',label:'iPad',icon:'🍎',sub:'iPadOS'},
+  ]
 };
-var TOPICS = ['🌐 אינטרנט','⚡ הפעלה','❄️ ביצועים','🔊 קול','📷 וידאו שיחות','📧 דואר','🔒 סיסמאות','🔋 סוללה','🖨️ ציוד היקפי'];
-var activeTopic = null;
 
-// ══════════════════════════════════
-//   ניווט
-// ══════════════════════════════════
-function showScreen(n) {
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  document.getElementById('s'+n).classList.add('active');
-  state.screen = n;
-  updateBreadcrumb();
-}
-function goBack(n) { showScreen(n); }
-
-function updateBreadcrumb() {
-  var bc = document.getElementById('breadcrumb');
-  var parts = [];
-  if (state.deviceLabel) parts.push({l: state.deviceLabel, sc: 1});
-  if (state.osLabel)     parts.push({l: state.osLabel, sc: 2});
-  if (state.screen===3)  parts.push({l: 'חיפוש', active: true});
-  var html = '';
-  parts.forEach(function(p, i) {
-    if (i) html += '<span class="crumb-sep">›</span>';
-    html += '<span class="crumb'+(p.active?' active':'')+'">'+p.l+'</span>';
-  });
-  bc.innerHTML = html;
+// ===== NAVIGATION =====
+function goScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
 }
 
-function selectDevice(id, icon, label) {
-  state.device = id;
-  state.deviceLabel = icon + ' ' + label;
-  var title = document.getElementById('s2-title');
-  title.textContent = 'בחרו מערכת הפעלה';
-  var list = document.getElementById('os-list');
-  list.innerHTML = '';
-  var osList = OS_MAP[id] || [];
-  osList.forEach(function(os) {
-    var btn = document.createElement('button');
-    btn.className = 'os-btn';
-    btn.innerHTML = '<span class="os-icon">'+os.icon+'</span><div><div class="os-label">'+os.label+'</div><div class="os-desc">'+os.desc+'</div></div>';
-    btn.onclick = function() { selectOS(os.id, os.label); };
-    list.appendChild(btn);
-  });
-  showScreen(2);
+function selectDevice(dev, label) {
+  state.device = dev;
+  state.deviceLabel = label;
+  document.getElementById('bc-device').textContent = label;
+  document.getElementById('bc-device2').textContent = label;
+  buildOSCards(dev);
+  goScreen('os');
 }
 
-function selectOS(id, label) {
-  state.os = id;
+function buildOSCards(dev) {
+  const options = OS_MAP[dev] || [];
+  const container = document.getElementById('os-cards');
+  container.innerHTML = options.map(o => `
+    <div class="card" onclick="selectOS('${o.id}','${o.label}')">
+      <div class="card-icon">${o.icon}</div>
+      <div class="card-label">${o.label}</div>
+      <div class="card-sub">${o.sub}</div>
+    </div>
+  `).join('');
+}
+
+function selectOS(os, label) {
+  state.os = os;
   state.osLabel = label;
-  buildTopics();
+  document.getElementById('bc-os').textContent = label;
+  document.getElementById('ctx-device').textContent = '📱 ' + state.deviceLabel;
+  document.getElementById('ctx-os').textContent = '💻 ' + label;
+  state.activeTag = null;
+  buildTags();
   document.getElementById('search-input').value = '';
-  document.getElementById('db-results-area').innerHTML = '';
-  document.getElementById('ai-area').classList.add('hidden');
-  activeTopic = null;
-  showScreen(3);
+  document.getElementById('results-area').innerHTML = '';
+  document.getElementById('answer-area').innerHTML = '';
+  renderInitialState();
+  goScreen('search');
 }
 
-function buildTopics() {
-  var row = document.getElementById('topics-row');
-  row.innerHTML = '';
-  var osId = state.os;
-  // הציגו רק נושאים שיש עליהם ערכים ב-DB לOS הנבחר
-  var available = {};
-  db.forEach(function(item) {
-    if (item.dev.indexOf(osId) !== -1) available[item.cat] = true;
-  });
-  TOPICS.forEach(function(t) {
-    if (!available[t]) return;
-    var chip = document.createElement('button');
-    chip.className = 'topic-chip';
-    chip.textContent = t;
-    chip.onclick = function() { toggleTopic(t, chip); };
-    row.appendChild(chip);
+// ===== SEARCH =====
+function getRelevantKB() {
+  return KB.filter(item => {
+    if (!state.os) return true;
+    return item.dev.includes('ALL') || item.dev.includes(state.os);
   });
 }
 
-function toggleTopic(topic, el) {
-  document.querySelectorAll('.topic-chip').forEach(function(c){ c.classList.remove('active'); });
-  if (activeTopic === topic) {
-    activeTopic = null;
-    document.getElementById('search-input').value = '';
-    document.getElementById('db-results-area').innerHTML = '';
-  } else {
-    activeTopic = topic;
-    el.classList.add('active');
-    document.getElementById('search-input').value = '';
-    showTopicResults(topic);
+function buildTags() {
+  const relevant = getRelevantKB();
+  const usedCats = [...new Set(relevant.map(i => i.cat))];
+  const row = document.getElementById('tags-row');
+  row.innerHTML = usedCats.map(c => `
+    <button class="tag ${state.activeTag === c ? 'active' : ''}" onclick="toggleTag('${c.replace(/'/g,"\'")}')">${c}</button>
+  `).join('');
+}
+
+function toggleTag(cat) {
+  state.activeTag = state.activeTag === cat ? null : cat;
+  buildTags();
+  onSearch();
+}
+
+function renderInitialState() {
+  document.getElementById('results-area').innerHTML = `
+    <div class="empty-state">
+      <div class="icon">🔍</div>
+      <p>הקלד את הבעיה למעלה כדי לחפש פתרון<br>או בחר נושא מהתגיות</p>
+    </div>`;
+}
+
+function onSearch() {
+  const q = document.getElementById('search-input').value.trim();
+  const relevant = getRelevantKB();
+  let filtered = relevant;
+  if (state.activeTag) filtered = filtered.filter(i => i.cat === state.activeTag);
+  if (q.length >= 2) {
+    const terms = q.toLowerCase().split(' ');
+    filtered = filtered.filter(i => {
+      const blob = (i.title + ' ' + i.kw.join(' ')).toLowerCase();
+      return terms.every(t => blob.includes(t));
+    });
   }
-  document.getElementById('ai-area').classList.add('hidden');
+  renderResults(filtered, q);
 }
 
-function showTopicResults(topic) {
-  var osId = state.os;
-  var matches = db.filter(function(item) {
-    return item.cat === topic && item.dev.indexOf(osId) !== -1;
-  });
-  renderDBResults(matches, '', 'נושאים ב' + topic);
-}
-
-// ══════════════════════════════════
-//   חיפוש
-// ══════════════════════════════════
-function onInput() {
-  var q = document.getElementById('search-input').value.trim();
-  // כיבוי פילטר נושא בעת הקלדה
-  if (q) {
-    activeTopic = null;
-    document.querySelectorAll('.topic-chip').forEach(function(c){ c.classList.remove('active'); });
-    var matches = searchDB(q);
-    renderDBResults(matches, q, null);
-    document.getElementById('ai-area').classList.add('hidden');
-  } else {
-    document.getElementById('db-results-area').innerHTML = '';
-    document.getElementById('ai-area').classList.add('hidden');
-  }
-}
-
-function searchDB(q) {
-  if (!q) return [];
-  var osId = state.os;
-  var words = q.toLowerCase().split(/\s+/);
-  var scored = [];
-  db.forEach(function(item) {
-    if (item.dev.indexOf(osId) === -1) return;
-    var text = (item.title + ' ' + item.kw.join(' ')).toLowerCase();
-    var sc = 0;
-    words.forEach(function(w) { if (text.indexOf(w) !== -1) sc++; });
-    if (sc > 0) scored.push({item: item, sc: sc});
-  });
-  scored.sort(function(a,b){ return b.sc - a.sc; });
-  return scored.map(function(s){ return s.item; }).slice(0, 5);
-}
-
-function renderDBResults(matches, q, customLabel) {
-  var area = document.getElementById('db-results-area');
-  if (!matches.length) {
-    if (q) {
-      area.innerHTML = '';
-    } else {
-      area.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px 0">לא נמצאו תוצאות</div>';
-    }
+function renderResults(items, q) {
+  const area = document.getElementById('results-area');
+  if (items.length === 0 && q.length >= 2) {
+    area.innerHTML = `
+      <div class="no-results-ai">
+        <p>לא נמצאה בעיה מתאימה במאגר.<br>לחץ על "שאל את ה-AI" לקבלת עזרה מותאמת אישית.</p>
+        <button class="ai-btn" onclick="triggerAI()"><span>🤖</span> שאל את ה-AI</button>
+      </div>`;
     return;
   }
-  var label = customLabel || (matches.length + ' תוצאות מהמאגר');
-  var html = '<div class="results-label">'+ label +'</div>';
-  matches.forEach(function(item) {
-    var titleH = q ? highlight(item.title, q) : item.title;
-    html += '<div class="result-card" onclick="showAnswer(\''+item.id+'\')"><div class="r-title">'+titleH+'</div><div class="r-meta">'+item.cat+'</div></div>';
-  });
-  area.innerHTML = html;
+  if (items.length === 0) { renderInitialState(); return; }
+  area.innerHTML = `<div class="results-list">${items.map(item => `
+    <div class="result-card" onclick="showLocalAnswer(${JSON.stringify(item).replace(/"/g,'&quot;')})">
+      <div class="result-header">
+        <span class="result-cat">${item.cat.split(' ')[0]}</span>
+        <span class="result-title">${item.title}</span>
+        <span class="result-arrow">◀</span>
+      </div>
+      <div class="result-preview">${item.steps[0]}</div>
+    </div>
+  `).join('')}</div>`;
 }
 
-function highlight(text, q) {
-  var words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  var result = text;
-  words.forEach(function(w) {
-    var re = new RegExp('('+w+')', 'gi');
-    result = result.replace(re, '<mark>$1</mark>');
-  });
-  return result;
+function showLocalAnswer(item) {
+  state.currentAnswer = { title: item.title, steps: item.steps, tip: item.tip, source: 'local' };
+  renderAnswer(state.currentAnswer);
+  document.getElementById('results-area').innerHTML = '';
+  document.getElementById('search-input').value = item.title;
 }
 
-function doSearch() {
-  var q = document.getElementById('search-input').value.trim();
+function renderAnswer(answer) {
+  const area = document.getElementById('answer-area');
+  const badge = answer.source === 'ai'
+    ? '<span class="answer-source-badge ai">🤖 תשובת AI</span>'
+    : '<span class="answer-source-badge local">📚 מהמאגר</span>';
+  area.innerHTML = `
+    <div class="answer-panel">
+      ${badge}
+      <div class="answer-title">${answer.title}</div>
+      <ol class="answer-steps">
+        ${answer.steps.map((s,i) => `
+          <li>
+            <span class="step-num">${i+1}</span>
+            <span class="step-text">${s}</span>
+          </li>
+        `).join('')}
+      </ol>
+      ${answer.tip ? `<div class="answer-tip"><strong>💡 טיפ:</strong> ${answer.tip}</div>` : ''}
+      <button class="share-btn" onclick="openWaShareModal()">
+        <span>💬</span> שלח בוואטסאפ למבוגר
+      </button>
+    </div>`;
+  area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function onSearchKey(e) {
+  if (e.key === 'Enter') triggerAI();
+}
+
+// ===== AI =====
+async function triggerAI() {
+  const q = document.getElementById('search-input').value.trim();
   if (!q) return;
-  callAI(q);
-}
-
-// ══════════════════════════════════
-//   תשובה מהמאגר
-// ══════════════════════════════════
-function showAnswer(id) {
-  var item = db.find(function(x){ return x.id === id; });
-  if (!item) return;
-  document.getElementById('db-results-area').innerHTML = '';
-  document.getElementById('ai-area').classList.remove('hidden');
-  document.getElementById('ai-typing').classList.add('hidden');
-  var stepsHTML = item.steps.map(function(s, i) {
-    return '<div class="ai-step"><div class="ai-step-num">'+(i+1)+'</div><div class="ai-step-text">'+s+'</div></div>';
-  }).join('');
-  document.getElementById('ai-content').innerHTML =
-    '<div class="db-badge">✅ מהמאגר</div>' +
-    '<div style="font-size:16px;font-weight:700;margin-bottom:14px">'+item.title+'</div>' +
-    '<div class="answer-steps">'+stepsHTML+'</div>' +
-    '<div class="answer-tip">'+item.tip+'</div>' +
-    waShareBtns(item.title, item.steps, item.tip) +
-    '<button class="btn-reset" onclick="resetAll()" style="margin-top:10px">🔄 בעיה חדשה</button>';
-}
-
-// ══════════════════════════════════
-//   קריאת AI
-// ══════════════════════════════════
-function callAI(question) {
-  var osId = state.os;
-  var osLabel = state.osLabel;
-  var devLabel = state.deviceLabel;
-
-  // הצג ממשק טעינה
-  var aiArea = document.getElementById('ai-area');
-  aiArea.classList.remove('hidden');
-  document.getElementById('ai-typing').classList.remove('hidden');
-  document.getElementById('ai-content').innerHTML = '';
-  document.getElementById('db-results-area').innerHTML = '';
-
-  var systemPrompt = 'אתה עוזר טכני מקצועי בעברית למתנדבי גימלאטק שעוזרים למבוגרים. ' +
-    'המשתמש עובד עם: ' + devLabel + ' / ' + osLabel + '. ' +
-    'ענה בצורה קצרה, ברורה ומעשית. השתמש בשפה פשוטה ומובנת. ' +
-    'כתוב בעברית RTL. ' +
-    'בנה את התשובה כך:\n' +
-    'שורה ראשונה: **כותרת קצרה של הבעיה**\n' +
-    'שורות 1. 2. 3. (עד 4): צעדים פשוטים לפתרון\n' +
-    'שורה אחרונה מתחילה ב-💡: טיפ קצר\n' +
-    'אל תשתמש ב-Markdown מורכב. ענה בקצרה.';
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 500,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: question }]
-    })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    document.getElementById('ai-typing').classList.add('hidden');
-    var text = '';
-    if (data.content && data.content[0] && data.content[0].text) {
-      text = data.content[0].text;
-    } else if (data.error) {
-      text = '⚠️ שגיאה: ' + (data.error.message || 'נסו שוב');
-    }
-    renderAIResponse(text, question);
-  })
-  .catch(function(err) {
-    document.getElementById('ai-typing').classList.add('hidden');
-    document.getElementById('ai-content').innerHTML =
-      '<div class="ai-error">⚠️ לא ניתן להתחבר. בדקו אינטרנט ונסו שוב.</div>' +
-      '<button class="btn-reset" onclick="resetAll()" style="margin-top:14px">🔄 בעיה חדשה</button>';
+  // Check if we have good local result
+  const relevant = getRelevantKB().filter(i => {
+    const blob = (i.title + ' ' + i.kw.join(' ')).toLowerCase();
+    return q.toLowerCase().split(' ').some(t => t.length > 2 && blob.includes(t));
   });
-}
+  if (relevant.length > 0 && !state.activeTag) {
+    showLocalAnswer(relevant[0]);
+    return;
+  }
+  // Call AI
+  const answerArea = document.getElementById('answer-area');
+  answerArea.innerHTML = `
+    <div class="answer-panel" style="text-align:center;padding:30px;">
+      <div class="spinner" style="margin:0 auto 14px;"></div>
+      <div style="color:var(--text-muted);font-size:0.85rem;">ה-AI מכין עבורך תשובה מותאמת...</div>
+    </div>`;
+  
+  const contextItems = getRelevantKB().slice(0,5).map(i => `- ${i.title}: ${i.steps[0]}`).join('\n');
+  const systemPrompt = `אתה עוזר טכני מנוסה שעוזר למתנדבי גימלאטק לסייע למבוגרים עם טכנולוגיה.
+הקשר: המשתמש עובד עם ${state.deviceLabel || 'מכשיר'} עם מערכת ${state.osLabel || 'לא ידועה'}.
 
-function renderAIResponse(text, question) {
-  // parse lines
-  var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-  var html = '';
-  var title = '';
-  var steps = [];
-  var tip = '';
+עקרונות:
+1. שפה פשוטה וברורה למבוגרים — אל תשתמש במונחים טכניים בלי הסבר
+2. צעדים ממוספרים, קצרים וברורים
+3. עודד את המשתמש — זה בסדר לא לדעת
+4. סיים תמיד בטיפ אחד מועיל
 
-  lines.forEach(function(line) {
-    // כותרת: מתחילה ב-** או שורה ראשונה ללא מספר
-    if (line.startsWith('**') && line.endsWith('**')) {
-      title = line.replace(/\*\*/g,'');
-    } else if (/^[1-4]\.\s/.test(line)) {
-      steps.push(line.replace(/^[1-4]\.\s/, ''));
-    } else if (line.startsWith('💡')) {
-      tip = line;
-    } else if (!title && steps.length === 0) {
-      title = line.replace(/\*\*/g,'');
-    }
-  });
+פורמט תשובה בדיוק כך (JSON בלבד, ללא קוד markdown):
+{
+  "title": "כותרת קצרה לבעיה",
+  "steps": ["צעד 1", "צעד 2", "צעד 3", "צעד 4"],
+  "tip": "טיפ אחד מועיל"
+}`;
 
-  if (title) html += '<div style="font-size:16px;font-weight:700;margin-bottom:14px;color:var(--text)">'+escH(title)+'</div>';
-  if (steps.length) {
-    html += '<div class="answer-steps">';
-    steps.forEach(function(s, i) {
-      html += '<div class="ai-step"><div class="ai-step-num">'+(i+1)+'</div><div class="ai-step-text">'+escH(s)+'</div></div>';
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `הבעיה: ${q}` }]
+      })
     });
-    html += '</div>';
+    const data = await response.json();
+    const text = data.content?.map(c => c.text || '').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    state.currentAnswer = { ...parsed, source: 'ai' };
+    renderAnswer(state.currentAnswer);
+  } catch(err) {
+    answerArea.innerHTML = `
+      <div class="answer-panel">
+        <div class="answer-title" style="color:var(--danger);">⚠️ שגיאה בחיבור ל-AI</div>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;">לא הצלחנו להתחבר ל-AI. ודא שיש חיבור לאינטרנט ונסה שנית. אם הבעיה נמשכת — נסה לחפש במאגר הידע הפנימי.</p>
+      </div>`;
   }
-  if (!title && !steps.length) {
-    // fallback — הצג כטקסט רגיל
-    html += '<div class="ai-content">'+escH(text)+'</div>';
+}
+
+// ===== WHATSAPP =====
+let waShareMode = false;
+
+function openWaShareModal() {
+  waShareMode = true;
+  document.getElementById('modal-sub-text').textContent = 'הזן את מספר הטלפון של המבוגר לשליחת ההוראות';
+  document.getElementById('wa-phone').value = '';
+  document.getElementById('wa-modal').classList.add('open');
+}
+
+function openWaModal() {
+  waShareMode = false;
+  document.getElementById('modal-sub-text').textContent = 'פתיחת וואטסאפ לצ\'אט ישיר עם תמיכת גימלאטק';
+  document.getElementById('wa-phone').value = '0505396068';
+  document.getElementById('wa-modal').classList.add('open');
+}
+
+function closeWaModal() {
+  document.getElementById('wa-modal').classList.remove('open');
+}
+
+function sendWa() {
+  let phone = document.getElementById('wa-phone').value.replace(/[-\s]/g,'');
+  if (!phone) phone = '972505396068';
+  if (phone.startsWith('0')) phone = '972' + phone.slice(1);
+  
+  let text = '';
+  if (waShareMode && state.currentAnswer) {
+    const a = state.currentAnswer;
+    text = `*${a.title}*\n\n`;
+    a.steps.forEach((s,i) => text += `${i+1}. ${s}\n`);
+    if (a.tip) text += `\n💡 טיפ: ${a.tip}`;
+    text += `\n\n— נשלח מ-GimlaTech AI Helper`;
+  } else {
+    text = 'שלום! מתנדב גימלאטק מבקש עזרה טכנית.';
   }
-  if (tip) html += '<div class="ai-tip">'+escH(tip)+'</div>';
-  html += waShareBtns(title || question, steps, tip);
-  html += '<button class="btn-reset" onclick="resetAll()" style="margin-top:10px">🔄 בעיה חדשה</button>';
-  document.getElementById('ai-content').innerHTML = html;
+  
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+  closeWaModal();
 }
 
-function escH(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// WhatsApp share
-var pendingWAText = '';
-function buildWAText(title, steps, tip) {
-  var lines = ['🛠️ *GimlaTech — ' + title + '*', ''];
-  steps.forEach(function(s, i) { lines.push((i+1) + '. ' + s); });
-  if (tip) lines.push('', tip);
-  return encodeURIComponent(lines.join('\n'));
-}
-function waShareBtns(title, steps, tip) {
-  pendingWAText = buildWAText(title, steps, tip);
-  var icon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
-  return '<button class="wa-share-btn" style="width:100%;margin-top:14px" onclick="openPhoneModal()">' + icon + ' שלח תשובה בוואטסאפ</button>';
-}
-
-function openPhoneModal() {
-  document.getElementById('wa-modal').classList.remove('hidden');
-  document.getElementById('wa-phone-input').value = '';
-  document.getElementById('wa-phone-input').focus();
-  document.getElementById('wa-modal-error').textContent = '';
-}
-function closePhoneModal() {
-  document.getElementById('wa-modal').classList.add('hidden');
-}
-function sendWANow() {
-  var raw = document.getElementById('wa-phone-input').value.trim().replace(/\D/g,'');
-  var err = document.getElementById('wa-modal-error');
-  if (raw.length < 9) { err.textContent = 'נא להכניס מספר תקין'; return; }
-  // המר לפורמט בינלאומי ישראלי אם צריך
-  var intl = raw;
-  if (raw.startsWith('0')) intl = '972' + raw.slice(1);
-  window.open('https://wa.me/' + intl + '?text=' + pendingWAText, '_blank');
-  closePhoneModal();
-}
-
-function resetAll() {
-  state = { device: null, deviceLabel: '', os: null, osLabel: '', screen: 1 };
-  activeTopic = null;
-  document.getElementById('search-input').value = '';
-  document.getElementById('db-results-area').innerHTML = '';
-  document.getElementById('ai-area').classList.add('hidden');
-  showScreen(1);
-}
+// Close modal on overlay click
+document.getElementById('wa-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeWaModal();
+});
 </script>
 </body>
 </html>
