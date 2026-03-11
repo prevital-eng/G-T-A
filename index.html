@@ -30,7 +30,7 @@
             overflow-x: hidden;
         }
 
-        /* סגנון כפתורי כרטיסיות */
+        /* סגנון כרטיסיות המכשירים */
         .card-btn {
             background-color: var(--surface);
             border: 2px solid var(--border);
@@ -51,11 +51,7 @@
             background-color: var(--surface2);
         }
 
-        .card-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* תיקון נראות טקסט בחיפוש - לבן על כהה */
+        /* שדה החיפוש - טקסט לבן על רקע כהה */
         .search-input {
             background-color: #1a2235 !important;
             color: #ffffff !important;
@@ -65,11 +61,6 @@
 
         .search-input::placeholder {
             color: #94a3b8 !important;
-        }
-
-        .search-input:focus {
-            border-color: var(--accent);
-            background-color: #222b42 !important;
         }
 
         .screen {
@@ -86,7 +77,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* פוטר ממורכז שלא חוסם לחיצות */
+        /* פוטר ממורכז ללא חסימת לחיצות */
         .footer-nav {
             position: fixed;
             bottom: 20px;
@@ -117,11 +108,6 @@
             width: 100%;
         }
 
-        .whatsapp-btn:hover {
-            background-color: #1ebc57;
-            transform: translateY(-2px);
-        }
-
         .tag {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -129,7 +115,6 @@
             border-radius: 9999px;
             font-size: 0.875rem;
             transition: all 0.2s;
-            color: var(--text-muted);
             cursor: pointer;
         }
 
@@ -163,31 +148,10 @@
             gap: 0.5rem;
             transition: all 0.2s;
         }
-        
-        .ai-action-btn:hover {
-            background: rgba(129, 140, 248, 0.2);
-            transform: scale(1.02);
-        }
-
-        .step-dot {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            border: 2px solid var(--border);
-        }
-
-        .step-dot.active { border-color: var(--accent); color: var(--accent); }
-        .step-dot.done { background: var(--accent); border-color: var(--accent); color: #000; }
-        .step-line { flex: 1; height: 2px; background: var(--border); }
     </style>
 </head>
 <body class="pb-32">
 
-    <!-- Header -->
     <header class="w-full py-6 flex justify-center items-center gap-3 border-b border-gray-800 bg-[#0d121f]/90 backdrop-blur-md sticky top-0 z-50">
         <div class="flex items-center gap-2">
             <span class="text-2xl font-black tracking-tighter text-white">Gimla<span class="text-sky-400">Tech</span></span>
@@ -203,11 +167,11 @@
             <p class="text-gray-400 text-center mb-8 text-lg">בחר את סוג המכשיר שבו יש תקלה</p>
             
             <div class="flex items-center gap-2 mb-10 max-w-xs mx-auto">
-                <div class="step-dot active">1</div>
-                <div class="step-line"></div>
-                <div class="step-dot">2</div>
-                <div class="step-line"></div>
-                <div class="step-dot">3</div>
+                <div class="step-dot active bg-sky-500 text-black rounded-full w-8 h-8 flex items-center justify-center font-bold">1</div>
+                <div class="flex-1 h-1 bg-border"></div>
+                <div class="step-dot border-2 border-border text-text-muted rounded-full w-8 h-8 flex items-center justify-center">2</div>
+                <div class="flex-1 h-1 bg-border"></div>
+                <div class="step-dot border-2 border-border text-text-muted rounded-full w-8 h-8 flex items-center justify-center">3</div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -242,17 +206,17 @@
             <h1 class="text-3xl font-extrabold mb-2 text-center text-white">איזו מערכת הפעלה?</h1>
             
             <div class="flex items-center gap-2 mb-10 max-w-xs mx-auto">
-                <div class="step-dot done">✓</div>
-                <div class="step-line bg-sky-500"></div>
-                <div class="step-dot active">2</div>
-                <div class="step-line"></div>
-                <div class="step-dot">3</div>
+                <div class="step-dot bg-sky-500 text-black rounded-full w-8 h-8 flex items-center justify-center font-bold">✓</div>
+                <div class="flex-1 h-1 bg-sky-500"></div>
+                <div class="step-dot bg-sky-500 text-black rounded-full w-8 h-8 flex items-center justify-center font-bold">2</div>
+                <div class="flex-1 h-1 bg-border"></div>
+                <div class="step-dot border-2 border-border text-text-muted rounded-full w-8 h-8 flex items-center justify-center">3</div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="os-options"></div>
         </section>
 
-        <!-- Screen 3: Search -->
+        <!-- Screen 3: Search Area -->
         <section id="screen-search" class="screen">
             <div class="flex items-center gap-4 text-sm mb-6 flex-wrap bg-gray-800/20 p-3 rounded-xl border border-gray-800">
                 <button onclick="goScreen('device')" class="text-gray-400 hover:text-white">🏠 מכשיר: <b id="bread-device" class="text-sky-400"></b></button>
@@ -263,7 +227,7 @@
             <div class="space-y-6">
                 <div class="flex flex-col md:flex-row gap-3">
                     <div class="relative flex-grow">
-                        <input type="text" id="query-input" placeholder="מה הבעיה? (למשל: איך מעבירים SMS למחשב)" 
+                        <input type="text" id="query-input" placeholder="מה הבעיה? (למשל: איך מחברים אוזניות)" 
                                class="search-input w-full p-5 pr-6 rounded-2xl text-lg font-medium shadow-2xl"
                                oninput="debouncedSearch()" onkeydown="if(event.key==='Enter') triggerAI()">
                     </div>
@@ -271,7 +235,7 @@
                         <button onclick="triggerAI()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-lg flex-grow md:flex-grow-0">
                             🌐 שאל AI
                         </button>
-                        <button onclick="document.getElementById('image-upload').click()" class="bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-2xl transition-all shadow-lg" title="צרף תמונה לניתוח">
+                        <button onclick="document.getElementById('image-upload').click()" class="bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-2xl transition-all shadow-lg" title="צרף תמונה">
                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
                         </button>
                         <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
@@ -282,7 +246,7 @@
                 <div id="results-area" class="grid grid-cols-1 gap-3"></div>
             </div>
 
-            <!-- Solution View (מוסתר כברירת מחדל) -->
+            <!-- Solution Container (מוסתר כברירת מחדל) -->
             <div id="answer-container" class="hidden mt-8">
                 <div class="bg-[#1e293b] border-2 border-indigo-500/30 rounded-3xl p-6 md:p-10 shadow-2xl relative">
                     <button onclick="closeAnswer()" class="absolute left-4 top-4 text-gray-500 hover:text-white p-2">
@@ -310,17 +274,15 @@
             computer: [{ id: 'WIN', label: 'Windows', icon: '🪟' }, { id: 'MAC', label: 'Mac', icon: '🍎' }],
             phone: [{ id: 'AND', label: 'Android', icon: '🤖' }, { id: 'IOS', label: 'iPhone', icon: '🍎' }],
             tablet: [{ id: 'AND', label: 'Android', icon: '🤖' }, { id: 'IOS', label: 'iPad', icon: '🍎' }],
-            peripheral: [{ id: 'PC', label: 'מחובר למחשב', icon: '🖥️' }, { id: 'MOB', label: 'מחובר לטלפון', icon: '📱' }]
+            peripheral: [{ id: 'PC', label: 'מחשב', icon: '🖥️' }, { id: 'MOB', label: 'טלפון', icon: '📱' }]
         };
 
+        // מאגר ידע מורחב של שאלות "איך עושים"
         const KB = [
-            // Computer
-            { id: 1, dev: ['WIN', 'MAC'], cat: '🌐 אינטרנט', title: 'איך מתחברים ל-WiFi?', steps: ['לחץ על סמל הרשת למטה בצד', 'בחר את שם הרשת הביתית', 'הזן את הסיסמה (מופיעה על הראוטר)', 'לחץ על "התחבר"'], tip: 'אם המחשב לא מזהה את הרשת, נסה לכבות ולהדליק את הראוטר.' },
-            { id: 2, dev: ['WIN', 'MAC'], cat: '❄️ ביצועים', title: 'איך מנקים מחשב איטי?', steps: ['בצע הפעלה מחדש (Restart)', 'סגור טאבים מיותרים בדפדפן', 'רוקן את סל המחזור'], tip: 'מחשב שלא כובה שבועות נוטה להיות איטי מאוד.' },
-            
-            // Phone/SMS
-            { id: 102, dev: ['AND', 'WIN'], cat: '📱 הודעות', title: 'איך מעבירים הודעות SMS למחשב?', steps: ['במחשב: כנס לאתר messages.google.com', 'בטלפון: פתח את אפליקציית "הודעות"', 'לחץ על תמונת הפרופיל ← "צימוד מכשירים"', 'סרוק עם הטלפון את קוד ה-QR שמופיע במחשב'], tip: 'זה עובד רק באפליקציית "הודעות" הרשמית של גוגל.' },
-            { id: 101, dev: ['AND', 'IOS'], cat: '⚙️ הגדרות', title: 'איך מגדילים את הכתב?', steps: ['כנס להגדרות המכשיר', 'בחר ב"תצוגה" או "נגישות"', 'לחץ על "גודל טקסט"', 'גרור את הסמן ימינה'], tip: 'באייפון אפשר גם להפעיל "כתב מודגש" לשיפור הקריאה.' }
+            { id: 201, dev: ['AND', 'WIN'], cat: '📱 הודעות', title: 'איך מעבירים הודעות SMS למחשב?', steps: ['במחשב: כנס לאתר messages.google.com', 'בטלפון: פתח את אפליקציית "הודעות" (Messages)', 'לחץ על תמונת הפרופיל שלך ← "צימוד מכשירים"', 'סרוק עם הטלפון את קוד ה-QR שמופיע במחשב'], tip: 'לאחר מכן כל ההודעות יסונכרנו למחשב באופן קבוע.' },
+            { id: 202, dev: ['AND', 'IOS'], cat: '🔊 שמע', title: 'איך מחברים אוזניות לטלפון?', steps: ['הפעל את ה-Bluetooth בהגדרות הטלפון', 'ודא שהאוזניות במצב "צימוד" (pairing)', 'לחץ על שם האוזניות ברשימת המכשירים בטלפון', 'אשר את החיבור'], tip: 'אם האוזניות לא מופיעות, כבה והדלק אותן שוב.' },
+            { id: 203, dev: ['WIN'], cat: '🖥️ כללי', title: 'איך מצלמים מסך במחשב?', steps: ['לחץ על מקש Windows + Shift + S במקלדת', 'סמן עם העכבר את האזור שברצונך לצלם', 'התמונה נשמרה ב"לוח" - ניתן להדביק אותה בוואטסאפ (Ctrl+V)'], tip: 'התמונה נשמרת אוטומטית גם בתיקיית "צילומי מסך".' },
+            { id: 101, dev: ['AND', 'IOS'], cat: '⚙️ הגדרות', title: 'איך מגדילים את הכתב?', steps: ['כנס להגדרות ← תצוגה', 'חפש "גודל גופן" או "גודל טקסט"', 'הזז את הסמן ימינה עד לגודל הרצוי'], tip: 'באייפון ניתן להפעיל גם "טקסט מודגש".' }
         ];
 
         function goScreen(id) {
@@ -379,18 +341,12 @@
         function searchKB(q) {
             const resultsArea = document.getElementById('results-area');
             if(!resultsArea) return;
-            
             const filtered = KB.filter(item => 
                 item.dev.includes(state.os) && 
                 (item.title.toLowerCase().includes(q.toLowerCase()) || item.cat.toLowerCase().includes(q.toLowerCase())) && 
                 (!state.activeTag || item.cat === state.activeTag)
             );
-
-            if (q.trim() === "" && !state.activeTag) {
-                resultsArea.innerHTML = "";
-                return;
-            }
-
+            if (q.trim() === "" && !state.activeTag) { resultsArea.innerHTML = ""; return; }
             resultsArea.innerHTML = filtered.map(item => `
                 <button onclick='showAnswer(${JSON.stringify(item)})' class="card-btn flex-row justify-between items-center p-5 text-right">
                     <div>
@@ -407,13 +363,12 @@
             document.getElementById('answer-container').classList.remove('hidden');
             const content = document.getElementById('answer-content');
             const badge = isAI ? `<span class="bg-indigo-500/20 text-indigo-400 text-xs font-bold px-2 py-1 rounded border border-indigo-500/20">🔍 מענה AI</span>` : `<span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">מענה מהמאגר</span>`;
-            
             content.innerHTML = `
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                     ${badge}
                     <div class="flex gap-2">
-                        <button onclick="playAudio()" class="ai-action-btn" title="הקרא פתרון">🔊 השמע ✨</button>
-                        <button onclick="simplifyAnswer()" class="ai-action-btn" title="פשט הוראות">🪄 פשט ✨</button>
+                        <button onclick="playAudio()" class="ai-action-btn" title="הקרא">🔊 השמע ✨</button>
+                        <button onclick="simplifyAnswer()" class="ai-action-btn" title="פשט">🪄 פשט ✨</button>
                     </div>
                 </div>
                 <h2 class="text-2xl font-black mb-6 text-right text-white">${item.title}</h2>
@@ -426,21 +381,18 @@
             document.getElementById('answer-container').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function closeAnswer() {
-            document.getElementById('answer-container').classList.add('hidden');
-        }
+        function closeAnswer() { document.getElementById('answer-container').classList.add('hidden'); }
 
-        async function callGemini(payload, model = "gemini-2.5-flash-preview-09-2025") {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            const delays = [1000, 2000, 4000];
-            for (let i = 0; i < 3; i++) {
+        async function fetchAI(payload) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            for (let i = 0; i < 5; i++) {
                 try {
                     const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                     if (response.ok) return await response.json();
                 } catch (e) {}
-                await new Promise(r => setTimeout(r, delays[i]));
+                await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
             }
-            throw new Error("API Connection Error");
+            throw new Error("Failed");
         }
 
         async function triggerAI() {
@@ -448,28 +400,18 @@
             if (!query) return;
             document.getElementById('answer-container').classList.remove('hidden');
             const content = document.getElementById('answer-content');
-            content.innerHTML = `<div class="flex flex-col items-center py-10 gap-4"><div class="spinner"></div><p class="text-indigo-300 font-bold">ה-AI מנתח ומכין פתרון...</p></div>`;
+            content.innerHTML = `<div class="flex flex-col items-center py-10 gap-4"><div class="spinner"></div><p class="text-indigo-300 font-bold">ה-AI מכין פתרון...</p></div>`;
             try {
                 const payload = {
-                    contents: [{ parts: [{ text: `בעיה: ${query}. מכשיר: ${state.deviceLabel} (${state.osLabel}). תן פתרון פשוט למבוגר. החזר JSON: {"title":"...","steps":["..."],"tip":"..."}` }] }],
+                    contents: [{ parts: [{ text: `בעיה: ${query}. מכשיר: ${state.deviceLabel} (${state.osLabel}). הסבר שלב אחר שלב למבוגרים. החזר JSON: {"title":"...","steps":["..."],"tip":"..."}` }] }],
                     tools: [{ "google_search": {} }],
                     generationConfig: { responseMimeType: "application/json" }
                 };
-                const result = await callGemini(payload);
-                showAnswer(JSON.parse(result.candidates[0].content.parts[0].text), true);
-            } catch (err) { content.innerHTML = `<div class="text-center py-8 text-red-400">שגיאה. נסה לנסח מחדש.</div>`; }
-        }
-
-        async function simplifyAnswer() {
-            if (!state.currentAnswer) return;
-            const content = document.getElementById('answer-content');
-            const originalHTML = content.innerHTML;
-            content.innerHTML = `<div class="flex flex-col items-center py-10 gap-4"><div class="spinner"></div><p class="text-indigo-300 font-bold">מפשט את ההסבר... ✨</p></div>`;
-            try {
-                const prompt = `פשט עבור אדם מבוגר מאוד. השתמש במילים חמות ומעודדות. תוכן: ${JSON.stringify(state.currentAnswer)}`;
-                const result = await callGemini({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } });
-                showAnswer(JSON.parse(result.candidates[0].content.parts[0].text), true);
-            } catch (err) { content.innerHTML = originalHTML; }
+                const result = await fetchAI(payload);
+                const text = result.candidates[0].content.parts[0].text;
+                const match = text.match(/\{[\s\S]*\}/);
+                showAnswer(JSON.parse(match ? match[0] : text), true);
+            } catch (err) { content.innerHTML = `<div class="text-center py-8 text-red-400">שגיאה בחיבור ל-AI. נסה לנסח מחדש.</div>`; }
         }
 
         async function handleImageUpload(event) {
@@ -480,17 +422,14 @@
                 const base64Data = e.target.result.split(',')[1];
                 document.getElementById('answer-container').classList.remove('hidden');
                 const content = document.getElementById('answer-content');
-                content.innerHTML = `<div class="flex flex-col items-center py-10 gap-4"><div class="spinner"></div><p class="text-indigo-300 font-bold">מנתח את התמונה... ✨</p></div>`;
+                content.innerHTML = `<div class="flex flex-col items-center py-10 gap-4"><div class="spinner"></div><p class="text-indigo-300 font-bold">מנתח תמונה... ✨</p></div>`;
                 try {
-                    const result = await callGemini({
-                        contents: [{ parts: [
-                            { text: "נתח את תמונת התקלה והסבר למבוגר מה לעשות. החזר JSON: {\"title\":\"...\",\"steps\":[\"...\"],\"tip\":\"...\"}" },
-                            { inlineData: { mimeType: "image/png", data: base64Data } }
-                        ]}],
+                    const result = await fetchAI({
+                        contents: [{ parts: [{ text: "נתח את התמונה והצע פתרון למבוגר. החזר JSON: {\"title\":\"...\",\"steps\":[\"...\"],\"tip\":\"...\"}" }, { inlineData: { mimeType: "image/png", data: base64Data } }] }],
                         generationConfig: { responseMimeType: "application/json" }
                     });
                     showAnswer(JSON.parse(result.candidates[0].content.parts[0].text), true);
-                } catch (err) { content.innerHTML = `<div class="text-center py-8 text-red-400">שגיאה בניתוח התמונה.</div>`; }
+                } catch (err) { content.innerHTML = `<div class="text-center py-8 text-red-400">שגיאה בניתוח.</div>`; }
             };
             reader.readAsDataURL(file);
         }
@@ -499,11 +438,11 @@
             if (!state.currentAnswer) return;
             const text = `${state.currentAnswer.title}. ${state.currentAnswer.steps.join(". ")}. טיפ: ${state.currentAnswer.tip}`;
             try {
-                const result = await callGemini({
+                const result = await fetchAI({
                     contents: [{ parts: [{ text: `Say in a calm Hebrew voice: ${text}` }] }],
                     model: "gemini-2.5-flash-preview-tts",
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } } }
-                }, "gemini-2.5-flash-preview-tts");
+                });
                 const pcmData = result.candidates[0].content.parts[0].inlineData.data;
                 const pcmBuffer = Uint8Array.from(atob(pcmData), c => c.charCodeAt(0)).buffer;
                 const wavHeader = new ArrayBuffer(44);
@@ -519,17 +458,26 @@
             } catch (err) {}
         }
 
+        async function simplifyAnswer() {
+            if (!state.currentAnswer) return;
+            const content = document.getElementById('answer-content');
+            const original = content.innerHTML;
+            content.innerHTML = `<div class="flex flex-col items-center py-10 gap-4"><div class="spinner"></div><p class="text-indigo-300 font-bold">מפשט עבור המבוגר... ✨</p></div>`;
+            try {
+                const result = await fetchAI({ contents: [{ parts: [{ text: `פשט עבור מבוגר: ${JSON.stringify(state.currentAnswer)}` }] }], generationConfig: { responseMimeType: "application/json" } });
+                showAnswer(JSON.parse(result.candidates[0].content.parts[0].text), true);
+            } catch (err) { content.innerHTML = original; }
+        }
+
         function copyAnswer() {
             const a = state.currentAnswer;
-            const text = `*פתרון עבור: ${a.title}*\n\n${a.steps.map((s, i) => `*${i + 1}.* ${s}`).join('\n')}\n\n💡 *טיפ:* ${a.tip}`;
+            const text = `*${a.title}*\n\n${a.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\n💡 *טיפ:* ${a.tip}`;
             const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            const btn = document.getElementById('copy-btn'); btn.innerHTML = "✅ הפתרון הועתק!";
+            const btn = document.getElementById('copy-btn'); btn.innerHTML = "✅ הועתק!";
             setTimeout(() => { btn.innerHTML = "📋 העתק פתרון"; }, 2000);
         }
 
-        function openSupportWa() {
-            window.open(`https://wa.me/972505396068?text=${encodeURIComponent("היי, אני מתנדב בגימלאטק וזקוק לעזרה נוספת...")}`, '_blank');
-        }
+        function openSupportWa() { window.open(`https://wa.me/972505396068?text=${encodeURIComponent("היי, אני מתנדב בגימלאטק וזקוק לעזרה נוספת...")}`, '_blank'); }
     </script>
 </body>
 </html>
