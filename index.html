@@ -173,44 +173,63 @@ function selectOS(id, label) {
     setTimeout(() => document.getElementById('query-input').focus(), 300);
 }
 
-// ===== GEMINI =====
-// כתובת ה-Apps Script — תעדכני לאחר הפריסה
+// ===== מאגר מקומי (נשמר ב-localStorage) =====
+function loadKB() {
+    try { return JSON.parse(localStorage.getItem('gimlatech_kb') || '[]'); } catch { return []; }
+}
+function saveKB(kb) {
+    localStorage.setItem('gimlatech_kb', JSON.stringify(kb));
+}
+function searchKB(q) {
+    const kb = loadKB();
+    const terms = q.toLowerCase().split(' ').filter(t => t.length > 1);
+    return kb.find(item =>
+        (item.dev === 'ALL' || item.dev === state.os) &&
+        terms.some(t => (item.title + ' ' + item.kw).toLowerCase().includes(t))
+    );
+}
+function saveToKB(answer, query) {
+    const kb = loadKB();
+    // לא לשמור כפילויות
+    const exists = kb.find(i => i.title === answer.title);
+    if (!exists) {
+        kb.unshift({ ...answer, dev: state.os, kw: query, saved: Date.now() });
+        if (kb.length > 100) kb.pop(); // מגבלה של 100 פריטים
+        saveKB(kb);
+    }
+}
+
+// ===== APPS SCRIPT PROXY =====
 const PROXY_URL = 'https://script.google.com/macros/s/AKfycbygHNSwS_gYDxrzxGSwvDdbJJcRNuvrLmrhEsze7-BRZqB0ahB0sfMHgLphuy7xgK0/exec';
 
-async function callGemini(userQuestion, imageBase64) {
-    const systemPrompt = `אתה עוזר טכני של גימלאטק — עוזרים למבוגרים עם טכנולוגיה.
-המכשיר: ${state.deviceLabel}, מערכת: ${state.osLabel}.
-כללים: עברית פשוטה, 3-5 צעדים קצרים, טיפ אחד.
-החזר JSON בלבד ללא שום טקסט נוסף:
-{"title":"כותרת","steps":["צעד 1","צעד 2","צעד 3"],"tip":"טיפ"}`;
-
-    const messages = [{ role:'user', content: userQuestion }];
+async function callAI(userQuestion) {
+    const systemPrompt = `אתה עוזר טכני תמציתי של גימלאטק — מתנדבים שעוזרים למבוגרים.
+מכשיר: ${state.deviceLabel} / ${state.osLabel}.
+חוקים: עברית פשוטה, בדיוק 3 צעדים קצרים, טיפ אחד.
+החזר JSON בלבד:
+{"title":"כותרת קצרה","steps":["צעד 1","צעד 2","צעד 3"],"tip":"טיפ קצר"}`;
 
     const res = await fetch(PROXY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ system: systemPrompt, messages })
+        body: JSON.stringify({
+            system: systemPrompt,
+            messages: [{ role:'user', content: userQuestion }]
+        })
     });
 
     if (!res.ok) throw new Error(`שגיאת שרת ${res.status}`);
-
     const data = await res.json();
-
-    // שגיאה מה-Apps Script
     if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
-
-    // שגיאה מ-Anthropic
     if (data.type === 'error') throw new Error(data.error?.message || JSON.stringify(data.error));
+    if (!data.content) throw new Error('תשובה ריקה: ' + JSON.stringify(data).slice(0,150));
 
-    const rawText = (data.content || [])
-        .filter(c => c.type === 'text').map(c => c.text).join('');
+    const rawText = (data.content || []).filter(c => c.type==='text').map(c => c.text).join('');
+    if (!rawText) throw new Error('לא התקבלה תשובה');
 
-    if (!rawText) throw new Error('לא התקבלה תשובה — בדוק שהמפתח תקין ב-Apps Script');
-
-    const jsonMatch = rawText.replace(/```json/gi,'').replace(/```/g,'').trim().match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('תשובה בפורמט לא תקין');
-
-    return { parsed: JSON.parse(jsonMatch[0]), sources: [] };
+    const match = rawText.replace(/```json/gi,'').replace(/```/g,'').trim().match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('פורמט תשובה שגוי');
+    return JSON.parse(match[0]);
 }
 
 // ===== UI HELPERS =====
@@ -222,18 +241,21 @@ function setLoading(msg) {
         </div>`;
 }
 
-function showAnswer(parsed, sources) {
+function showAnswer(parsed, isLocal, query) {
     state.answer = parsed;
-    const srcHtml = sources.length ? `<div class="flex flex-wrap gap-2 mb-5">
-        ${sources.map(s=>`<a href="${s.url}" target="_blank" rel="noopener"
-            class="text-xs text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2 py-1 rounded-full hover:underline">🔗 ${s.title}</a>`).join('')}
-    </div>` : '';
+    const badge = isLocal
+        ? `<span class="text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/20 px-3 py-1 rounded-full">📚 מהמאגר</span>`
+        : `<span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 px-3 py-1 rounded-full">🤖 מענה AI</span>`;
+
+    const saveBtn = isLocal ? '' : `
+        <button onclick="saveCurrent('${(query||'').replace(/'/g,"\\'")}') " id="save-btn" class="flex-1 bg-sky-700 hover:bg-sky-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
+            💾 שמור למאגר
+        </button>`;
 
     document.getElementById('answer-area').innerHTML = `
         <div class="answer-box">
-            <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 px-3 py-1 rounded-full">🌐 AI + חיפוש אינטרנט</span>
-            ${srcHtml ? '<div class="mt-4">'+srcHtml+'</div>' : ''}
-            <h2 class="text-xl font-black text-white mt-4 mb-5">${parsed.title}</h2>
+            <div class="mb-4">${badge}</div>
+            <h2 class="text-xl font-black text-white mb-4">${parsed.title}</h2>
             <div class="mb-5">
                 ${parsed.steps.map((s,i)=>`
                     <div class="step-row">
@@ -242,10 +264,33 @@ function showAnswer(parsed, sources) {
                     </div>`).join('')}
             </div>
             ${parsed.tip ? `<div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-amber-300 text-sm mb-5">💡 <b>טיפ:</b> ${parsed.tip}</div>` : ''}
-            <button onclick="shareWa()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
-                💬 שלח למבוגר בוואטסאפ
-            </button>
+            <div class="flex gap-2 flex-wrap">
+                <button onclick="copyAnswer()" id="copy-btn" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
+                    📋 העתק
+                </button>
+                <button onclick="shareWa()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
+                    💬 שלח בוואטסאפ
+                </button>
+                ${saveBtn}
+            </div>
         </div>`;
+}
+
+function saveCurrent(query) {
+    saveToKB(state.answer, query);
+    const btn = document.getElementById('save-btn');
+    if (btn) { btn.innerHTML = '✅ נשמר!'; btn.disabled = true; }
+}
+
+function copyAnswer() {
+    const a = state.answer;
+    if (!a) return;
+    const text = a.title + '\n\n' + a.steps.map((s,i) => (i+1) + '. ' + s).join('\n') + (a.tip ? '\n\nטיפ: ' + a.tip : '');
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = '✅ הועתק!';
+        setTimeout(() => { btn.innerHTML = '📋 העתק'; }, 2000);
+    });
 }
 
 function showError(msg) {
@@ -263,16 +308,24 @@ async function askAI() {
     if (!q) { document.getElementById('query-input').focus(); return; }
     if (state.loading) return;
 
+    // קודם בדוק במאגר המקומי
+    const local = searchKB(q);
+    if (local) {
+        showAnswer(local, true, q);
+        return;
+    }
+
     state.loading = true;
     document.getElementById('ai-btn').disabled = true;
-    setLoading('מחפש פתרון באינטרנט...');
+    setLoading('מחפש פתרון...');
 
     try {
-        const { parsed, sources } = await callGemini(q);
-        showAnswer(parsed, sources);
+        const parsed = await callAI(q);
+        showAnswer(parsed, false, q);
     } catch(err) {
         console.error(err);
-        showError(err.message?.includes('fetch') ? 'בעיית חיבור — ודא שיש אינטרנט ונסה שוב' : err.message);
+        const msg = err?.message || JSON.stringify(err);
+        showError(msg.includes('fetch') ? 'בעיית חיבור — ודא שיש אינטרנט ונסה שוב' : msg);
     } finally {
         state.loading = false;
         document.getElementById('ai-btn').disabled = false;
@@ -289,8 +342,8 @@ async function handleImage(event) {
         document.getElementById('ai-btn').disabled = true;
         setLoading('מנתח תמונה...');
         try {
-            const { parsed, sources } = await callGemini('נתח את התמונה ותן פתרון למבוגר.', base64);
-            showAnswer(parsed, sources);
+            const parsed = await callAI('נתח את התמונה ותן פתרון למבוגר.');
+            showAnswer(parsed, false, 'תמונה');
         } catch(err) {
             showError(err.message);
         } finally {
