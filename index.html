@@ -173,31 +173,7 @@ function selectOS(id, label) {
     setTimeout(() => document.getElementById('query-input').focus(), 300);
 }
 
-// ===== מאגר מקומי (נשמר ב-localStorage) =====
-function loadKB() {
-    try { return JSON.parse(localStorage.getItem('gimlatech_kb') || '[]'); } catch { return []; }
-}
-function saveKB(kb) {
-    localStorage.setItem('gimlatech_kb', JSON.stringify(kb));
-}
-function searchKB(q) {
-    const kb = loadKB();
-    const terms = q.toLowerCase().split(' ').filter(t => t.length > 1);
-    return kb.find(item =>
-        (item.dev === 'ALL' || item.dev === state.os) &&
-        terms.some(t => (item.title + ' ' + item.kw).toLowerCase().includes(t))
-    );
-}
-function saveToKB(answer, query) {
-    const kb = loadKB();
-    // לא לשמור כפילויות
-    const exists = kb.find(i => i.title === answer.title);
-    if (!exists) {
-        kb.unshift({ ...answer, dev: state.os, kw: query, saved: Date.now() });
-        if (kb.length > 100) kb.pop(); // מגבלה של 100 פריטים
-        saveKB(kb);
-    }
-}
+
 
 // ===== APPS SCRIPT PROXY =====
 const PROXY_URL = 'https://script.google.com/macros/s/AKfycbygHNSwS_gYDxrzxGSwvDdbJJcRNuvrLmrhEsze7-BRZqB0ahB0sfMHgLphuy7xgK0/exec';
@@ -247,10 +223,7 @@ function showAnswer(parsed, isLocal, query) {
         ? `<span class="text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/20 px-3 py-1 rounded-full">📚 מהמאגר</span>`
         : `<span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 px-3 py-1 rounded-full">🤖 מענה AI</span>`;
 
-    const saveBtn = isLocal ? '' : `
-        <button onclick="saveCurrent('${(query||'').replace(/'/g,"\\'")}') " id="save-btn" class="flex-1 bg-sky-700 hover:bg-sky-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
-            💾 שמור למאגר
-        </button>`;
+    const saveBtn = '';
 
     document.getElementById('answer-area').innerHTML = `
         <div class="answer-box">
@@ -273,11 +246,7 @@ function showAnswer(parsed, isLocal, query) {
         </div>`;
 }
 
-function saveCurrent(query) {
-    saveToKB(state.answer, query);
-    const btn = document.getElementById('save-btn');
-    if (btn) { btn.innerHTML = '✅ נשמר!'; btn.disabled = true; }
-}
+
 
 function copyAnswer() {
     const a = state.answer;
@@ -304,13 +273,6 @@ async function askAI() {
     const q = document.getElementById('query-input').value.trim();
     if (!q) { document.getElementById('query-input').focus(); return; }
     if (state.loading) return;
-
-    // קודם בדוק במאגר המקומי
-    const local = searchKB(q);
-    if (local) {
-        showAnswer(local, true, q);
-        return;
-    }
 
     state.loading = true;
     document.getElementById('ai-btn').disabled = true;
